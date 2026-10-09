@@ -3,8 +3,8 @@ import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { esValidacionDeCredenciales } from './error-interceptor';
-import { environment } from '../../environments/environment';
-import { isTokenExpired } from '../../app/shared/utils/jwt.utils';
+import { environment } from '../../../environments/environment';
+import { isTokenExpired } from '../../shared/utils/jwt.utils';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);

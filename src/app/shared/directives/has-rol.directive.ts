@@ -7,8 +7,8 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { AuthService } from '../../../core/services/auth.service';
-import { Role } from '../../../core/models/user';
+import { AuthService } from '../../core/services/auth.service';
+import { Role } from '../../core/models/user';
 
 @Directive({
   selector: '[appHasRole]',

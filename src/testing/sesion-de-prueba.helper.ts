@@ -8,7 +8,7 @@
 //   iniciarSesionDePrueba(GRUPO_PRUEBA, -60);   // token vencido hace 60 s
 //   afterEach(() => cerrarSesionDePrueba());
 
-import { Role, User } from "../core/models/user";
+import { Role, User } from "../app/core/models/user";
 
 
 /** Claves que usa AuthService. Si cambian en el servicio, se cambian solo acá. */

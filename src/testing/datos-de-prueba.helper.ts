@@ -9,7 +9,7 @@
 //
 // Los usuarios (id, email, nombre, rol) NO se repiten acá: se toman de
 // sesion-de-prueba.helper.ts, así el perfil y la sesión describen a la misma persona.
- import { LoginRequest, UsuarioCreateRequest } from '../core/models/auth.model';
+ import { LoginRequest, UsuarioCreateRequest } from '../app/core/models/auth.model';
 import { USUARIO_PRUEBA } from './sesion-de-prueba.helper';
 
 /** Contraseña válida para formularios (8–20 caracteres). */

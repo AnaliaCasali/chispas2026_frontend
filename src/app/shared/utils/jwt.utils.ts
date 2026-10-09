@@ -1,5 +1,5 @@
-import { JwtPayload } from "../../../core/models/jwt-payload.model";
-import { Role, User } from "../../../core/models/user";
+import { JwtPayload } from "../../core/models/jwt-payload.model";
+import { Role, User } from "../../core/models/user";
 
 
 export function decodeJwtPayload(token: string): JwtPayload | null {

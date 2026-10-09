@@ -16,7 +16,7 @@ import { Observable, tap } from 'rxjs';
 } from '../models/auth.model';
 import { JwtPayload } from '../models/jwt-payload.model';
 import { Role, User } from '../models/user';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
