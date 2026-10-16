@@ -12,7 +12,7 @@ import {
   responderSinConexion,
 } from '../../../testing/http-de-prueba.helper';
 import {
-  ORGANIZADOR_PRUEBA,
+  DOCENTE_PRUEBA,
   cerrarSesionDePrueba,
   iniciarSesionDePrueba,
 } from '../../../testing/sesion-de-prueba.helper';
@@ -45,7 +45,7 @@ describe('errorInterceptor', () => {
 
   describe('MANTENER_SESION_EN_403', () => {
     beforeEach(() => {
-      iniciarSesionDePrueba(ORGANIZADOR_PRUEBA);
+      iniciarSesionDePrueba(DOCENTE_PRUEBA);
       configurar();
     });
 

@@ -6,10 +6,10 @@ import { authInterceptor } from './auth.interceptor';
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../../environments/environment';
 import {
-  GRUPO_PRUEBA, cerrarSesionDePrueba, crearTokenDePrueba, iniciarSesionDePrueba,
+  ESTUDIANTE_PRUEBA, cerrarSesionDePrueba, crearTokenDePrueba, iniciarSesionDePrueba,
 } from '../../../testing/sesion-de-prueba.helper';
 import {
-  crearAgrupaciones, crearLocalidades, crearLoginRequest, crearRegistroUsuario, crearSeguidorDto,
+  crearLoginRequest, crearRegistroUsuario
 } from '../../../testing/datos-de-prueba.helper';
 import { responderSinConexion } from '../../../testing/http-de-prueba.helper';
 
@@ -33,21 +33,19 @@ describe('authInterceptor', () => {
 
   describe('header Authorization', () => {
     it('API propia → agrega el Bearer y entrega la respuesta intacta', () => {
-      const seguidos = [crearSeguidorDto()];
       let recibido: unknown;
       cliente.get(`${API}/seguidos/mios`).subscribe((r) => (recibido = r)); // Act
       const req = http.expectOne(`${API}/seguidos/mios`);
       expect(req.request.headers.get('Authorization')) // Assert
         .toBe(`Bearer ${TestBed.inject(AuthService).token()}`);
-      req.flush(seguidos);
-      expect(recibido).toEqual(seguidos);
+      const respuesta = [crearLoginRequest(), crearRegistroUsuario()];
+      req.flush(respuesta);
+      expect(recibido).toEqual(respuesta);
     });
 
     it.each([
       { metodo: 'POST', url: '/auth/login',            body: crearLoginRequest(),     respuesta: { token: crearTokenDePrueba() } },
-      { metodo: 'POST', url: '/auth/register/usuario', body: crearRegistroUsuario(),  respuesta: { token: crearTokenDePrueba() } },
-      { metodo: 'GET',  url: '/public/agrupaciones',   body: null,                    respuesta: crearAgrupaciones(2) },
-      { metodo: 'GET',  url: '/localidades',           body: null,                    respuesta: crearLocalidades() },
+      { metodo: 'POST', url: '/auth/register/usuario', body: crearRegistroUsuario(),  respuesta: { token: crearTokenDePrueba() } }
     ])('endpoint público $metodo $url → NO agrega el Bearer', ({ metodo, url, body, respuesta }) => {
       cliente.request(metodo, `${API}${url}`, { body }).subscribe();
       const req = http.expectOne(`${API}${url}`);
@@ -70,14 +68,14 @@ describe('authInterceptor', () => {
       const req = http.expectOne(`${API}/seguidos/mios`);
       // Assert
       expect(req.request.headers.has('Authorization')).toBe(false);
-      req.flush([crearSeguidorDto()]);
+      req.flush([crearLoginRequest()]);
     });
   });
 
   describe('token vencido', () => {
     it('no sale la petición y cierra la sesión', () => {
       // Arrange: se pisa la sesión del beforeEach antes de que AuthService lea el storage
-      iniciarSesionDePrueba(GRUPO_PRUEBA, -60);
+      iniciarSesionDePrueba(ESTUDIANTE_PRUEBA, -60);
       let error: Error | undefined;
       // Act
       cliente.get(`${API}/seguidos/mios`).subscribe({ error: (e) => (error = e) });

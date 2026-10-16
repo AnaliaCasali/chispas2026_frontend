@@ -4,15 +4,11 @@ import { ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/r
 import { authGuard } from './auth.guard';
 import { AuthService } from '../services/auth.service';
 import {
-  USUARIO_PRUEBA, cerrarSesionDePrueba, iniciarSesionCorrupta, iniciarSesionDePrueba,
+  ESTUDIANTE_PRUEBA, DOCENTE_PRUEBA, cerrarSesionDePrueba, iniciarSesionCorrupta, iniciarSesionDePrueba,
 } from '../../../testing/sesion-de-prueba.helper';
 import { providersDePrueba } from '../../../testing/http-de-prueba.helper';
 
 describe('authGuard', () => {
-  /**
-   * Configura TestBed y ejecuta el guard.
-   * Llamar DESPUÉS de preparar la sesión: AuthService lee el storage al crearse.
-   */
   function ejecutar(plataforma: 'browser' | 'server' = 'browser') {
     TestBed.configureTestingModule({
       providers: [...providersDePrueba(), { provide: PLATFORM_ID, useValue: plataforma }],
@@ -23,34 +19,25 @@ describe('authGuard', () => {
 
   afterEach(() => cerrarSesionDePrueba());
 
-  it('con sesión de GRUPO → deja pasar', () => {
-    // Arrange
-    iniciarSesionDePrueba();
-    // Act
-    const resultado = ejecutar();
-    // Assert
-    expect(resultado).toBe(true);
+  it('con sesión de ESTUDIANTE → deja pasar', () => {
+    iniciarSesionDePrueba(ESTUDIANTE_PRUEBA);
+    expect(ejecutar()).toBe(true);
   });
 
   it('con sesión de otro rol → también deja pasar (el rol lo controla roleGuard)', () => {
-    iniciarSesionDePrueba(USUARIO_PRUEBA);
+    iniciarSesionDePrueba(DOCENTE_PRUEBA);
     expect(ejecutar()).toBe(true);
   });
 
   it('sin sesión → redirige a /login', () => {
-    // Act
     const resultado = ejecutar() as UrlTree;
-    // Assert
     expect(resultado).toBeInstanceOf(UrlTree);
     expect(resultado.toString()).toBe('/login');
   });
 
   it('con sesión corrupta → cierra la sesión y redirige a /login', () => {
-    // Arrange
     iniciarSesionCorrupta();
-    // Act
     const resultado = ejecutar() as UrlTree;
-    // Assert
     expect(resultado.toString()).toBe('/login');
     const auth = TestBed.inject(AuthService);
     expect(auth.token()).toBeNull();
