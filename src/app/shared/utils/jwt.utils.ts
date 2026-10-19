@@ -24,6 +24,7 @@ return {
 id: payload.id,
 username: payload.sub, // "sub": "grupo@gmail.com"
 name: payload.name, // "name": "grupo test"
+apellido: payload.surname,
 role: payload.rol as Role, // "rol": "USER"
 };
  }

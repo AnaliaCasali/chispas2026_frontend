@@ -1,0 +1,160 @@
+:host {
+  display: block;
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  max-width: 480px;
+  margin: 0 auto;
+
+  font-family: 'Roboto', 'Inter', sans-serif;
+}
+
+/* Cabecera / Tarjeta Superior */
+.login-header {
+  background-color: #EAF0F9; /* Fondo celeste claro */
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  margin-bottom: 40px;
+  gap: 16px;
+}
+
+.folder-icon svg {
+  width: 56px;
+  height: 56px;
+}
+
+.header-text h1 {
+  margin: 0;
+  color: #102A63; /* Azul oscuro */
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.header-text p {
+  margin: 4px 0 0;
+  color: #5A6D95; /* Azul grisáceo */
+  font-size: 14px;
+}
+
+/* Tarjeta Central del Formulario */
+.login-card {
+  background-color: #EAF0F9; /* Mismo fondo celeste */
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-card h2 {
+  color: #102A63;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 30px;
+}
+
+/* Campos de Input */
+.field {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.mt-3 {
+  margin-top: 24px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper input {
+  width: 100%;
+  background-color: #EBE5E5; /* Tonalidad grisáceo/rosado claro */
+  border: none;
+  border-radius: 8px;
+  padding: 16px 44px 16px 16px; /* Espacio extra a la derecha para el ícono */
+  font-size: 15px;
+  color: #333333;
+  font-family: inherit;
+  outline: none;
+}
+
+.input-wrapper input::placeholder {
+  color: #7A7A7A;
+}
+
+.input-wrapper input:focus {
+  outline: 2px solid #2D6CCB;
+}
+
+.clear-icon {
+  position: absolute;
+  right: 16px;
+  width: 20px;
+  height: 20px;
+  color: #4A4A4A;
+}
+
+.helper-text {
+  display: block;
+  font-size: 11px;
+  color: #7A7A7A;
+  margin-top: 6px;
+  padding-left: 4px;
+}
+
+/* Textos de error */
+.error-text {
+  color: #D32F2F;
+  font-size: 12px;
+  margin: 6px 0 0;
+  padding-left: 4px;
+}
+
+.global-error {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+/* Botón Ingresar */
+.submit-btn {
+  width: 100%;
+  background-color: #2D6CCB; /* Azul primario del botón */
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: #2457A6;
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.submit-btn svg {
+  width: 24px;
+  height: 24px;
+}

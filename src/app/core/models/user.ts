@@ -1,10 +1,15 @@
-export interface User
-{ id: number; // = id
-username: string; // = sub
-name: string; // = name
-role: Role; // = rol
+export interface User {
+  id: number;
+  username: string; // email o DNI
+  name: string;
+  apellido: string; 
+  role: Role;
+  fotoUrl?: string;
 }
 
 export enum Role {
-  USUARIO = 'USUARIO',
+  ESTUDIANTE = 'ESTUDIANTE',
+  DOCENTE = 'DOCENTE',
+  PRECEPTOR = 'PRECEPTOR',
+  ADMIN = 'ADMIN'
 }

@@ -1,0 +1,84 @@
+<main class="login-container">
+  <!-- Cabecera / Logo -->
+  <header class="login-header">
+    <div class="folder-icon">
+      <!-- Icono de carpeta color cyan -->
+      <svg viewBox="0 0 24 24" fill="#1fc5e8" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M10 4H4C2.89 4 2.01 4.89 2.01 6L2 18C2 19.11 2.89 20 4 20H20C21.11 20 22 19.11 22 18V8C22 6.89 21.11 6 20 6H12L10 4Z"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>CARPETA DIGITAL</h1>
+      <p>Tu escuela organizada</p>
+    </div>
+  </header>
+
+  <!-- Tarjeta central de Iniciar Sesión -->
+  <div class="login-card">
+    <h2>INICIAR SESIÓN</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      
+      <!-- Campo Usuario -->
+      <div class="field">
+        <div class="input-wrapper">
+          <input 
+            id="username" 
+            type="text" 
+            formControlName="username" 
+            placeholder="Usuario" 
+            autocomplete="username" 
+          />
+          <i class="clear-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/>
+            </svg>
+          </i>
+        </div>
+        <span class="helper-text">Ingresá con tu usuario o DNI (sin puntos)</span>
+        
+        @if (username.touched && username.invalid) {
+          <p class="error-text">
+            @if (username.hasError('required')) { El usuario/DNI es obligatorio. }
+            @else if (username.hasError('minlength')) { Debe tener al menos 4 caracteres. }
+          </p>
+        }
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="field mt-3">
+        <div class="input-wrapper">
+          <input 
+            id="password" 
+            type="password" 
+            formControlName="password" 
+            placeholder="Contraseña" 
+            autocomplete="current-password" 
+          />
+          <i class="clear-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/>
+            </svg>
+          </i>
+        </div>
+        @if (password.touched && password.invalid) {
+          <p class="error-text">La contraseña es obligatoria.</p>
+        }
+      </div>
+
+      <!-- Mensaje de error global -->
+      @if (errorMessage()) {
+        <p class="error-text global-error">{{ errorMessage() }}</p>
+      }
+
+      <!-- Botón Ingresar -->
+      <button class="submit-btn" type="submit" [disabled]="isLoading()">
+        <span>{{ isLoading() ? 'Autenticando...' : 'INGRESAR' }}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+    </form>
+  </div>
+</main>

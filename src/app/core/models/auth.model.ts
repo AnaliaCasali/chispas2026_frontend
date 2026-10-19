@@ -1,37 +1,20 @@
 export interface LoginRequest {
-  username: string;   // es el email
+  username: string;   // email o DNI
   password: string;
 }
 
 // ---------------------------------------------------------------------------
-// Registro — POST /api/v1/auth/register/{usuario|grupo|organizador}
+// Registro — POST /api/v1/auth/register/usuario
 // El rol lo asigna fijo el backend; nunca viene del cliente.
 // ---------------------------------------------------------------------------
 
 export interface UsuarioCreateRequest {
-  username: string;     // email válido (@NotNull + @Email)
-  password: string;     // entre 8 y 20 caracteres
-  nombre: string;      // entre 2 y 100 caracteres
-  biografia?: string;   // opcional, máximo 500 caracteres
-  localidadId: number;  // ID existente en la tabla Localidad (@NotNull + @Positive)
-}
-
-export interface GrupoCreateRequest {
-  username: string;
+  dni: string;
+  email?: string;
   password: string;
   nombre: string;
-  biografia?: string;
-  director?: string;   // igual que Organizador: el backend lo guarda (GrupoCreateDTO)
-  localidadId: number;
-}
-
-export interface OrganizadorCreateRequest {
-  username: string;
-  password: string;
-  nombre: string;
-  biografia?: string;
-  director?: string;
-  localidadId: number;
+  apellido: string;
+  rol: string; 
 }
 
 export interface AuthResponse {

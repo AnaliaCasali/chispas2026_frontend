@@ -1,16 +1,14 @@
-// src/app/core/services/auth.service.ts
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
- import {
+import { Observable, delay, of, tap } from 'rxjs'; // IMPORTANTE: Agregados of y delay
+
+import {
   AuthResponse,
   CambiarPasswordRequest,
   ForgotPasswordRequest,
-  GrupoCreateRequest,
   LoginRequest,
-  OrganizadorCreateRequest,
   ResetPasswordRequest,
   UsuarioCreateRequest,
 } from '../models/auth.model';
@@ -20,36 +18,56 @@ import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-
-  // ── Dependencias ────────────────────────────────────────────
   private http        = inject(HttpClient);
   private router      = inject(Router);
-
-  // ✅ isPlatformBrowser: evita errores si la app corre en SSR (Angular Universal)
   private esBrowser   = isPlatformBrowser(inject(PLATFORM_ID));
 
-  // ── Constantes ───────────────────────────────────────────────
   private readonly API_URL   = `${environment.apiUrl}/auth`;
-  private readonly TOKEN_KEY = 'rcc_token';
-  private readonly USER_KEY  = 'rcc_user';
+  private readonly TOKEN_KEY = 'chispas_token';
+  private readonly USER_KEY  = 'chispas_user';
 
-  // ── Signals de estado ────────────────────────────────────────
   public token       = signal<string | null>(this.leerStorage(this.TOKEN_KEY));
   public currentUser = signal<User | null>(this.getUserFromStorage());
 
-  // ── Signals computados (solo lectura, derivados automáticamente) ──
   public isAuthenticated = computed(() => !!this.token() && !!this.currentUser());
   public userRole        = computed(() => this.currentUser()?.role ?? null);
 
-  // ── API pública ──────────────────────────────────────────────
-
   login(credentials: LoginRequest): Observable<AuthResponse> {
+    /*
+    // --- INICIO MOCK LOGIN ---
+    console.warn('⚠️ ATENCIÓN: Usando Login Mockeado (Modo Desarrollo)');
+    
+    // Generamos un payload falso válido que no expirará pronto y tiene rol ESTUDIANTE
+    const fakePayload = {
+      id: 99,
+      sub: credentials.username || '12345678',
+      name: 'Estudiante',
+      surname: 'De Prueba',
+      rol: 'ESTUDIANTE',
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 3600 // Expira en 1 hora
+    };
+
+    // Función para convertir a Base64URL (lo que espera el JWT decoder)
+    const base64url = (obj: any) =>
+      btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(obj))))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+
+    const fakeToken = `${base64url({ alg: 'HS256', typ: 'JWT' })}.${base64url(fakePayload)}.firma_falsa`;
+
+    return of({ token: fakeToken }).pipe(
+      delay(1000), // Simulamos 1 segundo de latencia de red
+      tap(res => this.saveSession(res.token))
+    );
+    // --- FIN MOCK LOGIN ---
+    ----------------------------------------------------------- */
     return this.http
       .post<AuthResponse>(`${this.API_URL}/login`, credentials)
       .pipe(tap(res => this.saveSession(res.token)));
+    
   }
-
-  // ── Registro (login automático: guarda la sesión con el token devuelto) ──
 
   registrarUsuario(datos: UsuarioCreateRequest): Observable<AuthResponse> {
     return this.http
@@ -57,25 +75,9 @@ export class AuthService {
       .pipe(tap(res => this.saveSession(res.token)));
   }
 
-  registrarGrupo(datos: GrupoCreateRequest): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${this.API_URL}/register/grupo`, datos)
-      .pipe(tap(res => this.saveSession(res.token)));
-  }
-
-  registrarOrganizador(datos: OrganizadorCreateRequest): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${this.API_URL}/register/organizador`, datos)
-      .pipe(tap(res => this.saveSession(res.token)));
-  }
-
-  // ── Cambio de contraseña del usuario autenticado (responde 204 sin cuerpo) ──
-
   cambiarPassword(datos: CambiarPasswordRequest): Observable<void> {
     return this.http.patch<void>(`${this.API_URL}/usuarios/cambiar-password`, datos);
   }
-
-  // ── Olvidé mi contraseña (endpoints públicos, responden 200 sin cuerpo) ──
 
   solicitarRecuperacion(datos: ForgotPasswordRequest): Observable<void> {
     return this.http.post<void>(`${this.API_URL}/forgot-password`, datos);
@@ -93,24 +95,19 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  // Acepta array para compatibilidad con guards y directiva HasRole
   hasRole(requiredRoles: Role[]): boolean {
     const role = this.userRole();
     return role ? requiredRoles.includes(role) : false;
   }
 
-  // Accesos directos a los claims — útiles en templates y componentes
   getEmail(): string | null  { return this.getPayload()?.sub  ?? null; }
   getNombre(): string | null { return this.getPayload()?.name ?? null; }
   getRol(): string | null { return this.userRole() ?? null;}
   getId(): number | null     { return this.getPayload()?.id   ?? null; }
 
-  // ── Métodos privados ─────────────────────────────────────────
-
   private saveSession(token: string): void {
     const user = this.buildUserFromToken(token);
     if (!user) throw new Error('Token JWT inválido o malformado');
-
     this.guardarStorage(this.TOKEN_KEY, token);
     this.guardarStorage(this.USER_KEY, JSON.stringify(user));
     this.token.set(token);
@@ -122,26 +119,23 @@ export class AuthService {
       const raw = this.leerStorage(this.USER_KEY);
       return raw ? JSON.parse(raw) : null;
     } catch {
-      // Si el JSON está corrupto, limpiar y forzar nuevo login
       this.borrarStorage(this.USER_KEY);
       return null;
     }
   }
 
-  // ✅ Construye el objeto User desde el payload del JWT
   private buildUserFromToken(token: string): User | null {
     const payload = this.getPayload(token);
     if (!payload) return null;
     return {
       id:       payload.id,
-      username: payload.sub,    // "sub": "grupo@gmail.com"
-      name:     payload.name,   // "name": "grupo test"
-      role:     payload.rol as Role,    // "rol": "GRUPO"
+      username: payload.sub,
+      name:     payload.name,
+      apellido: payload.surname,
+      role:     payload.rol as Role,
     };
   }
 
-  // ✅ decodeURIComponent + encodeURIComponent: soporta caracteres Unicode (tildes, ñ, etc.)
-  // ✅ No verifica la firma — eso lo hace el backend en cada request
   private getPayload(token?: string): JwtPayload | null {
     const jwt = token ?? this.token();
     if (!jwt) return null;
@@ -149,7 +143,6 @@ export class AuthService {
       const base64 = jwt.split('.')[1]
         .replace(/-/g, '+')
         .replace(/_/g, '/');
-
       const json = decodeURIComponent(
         atob(base64)
           .split('')
@@ -161,8 +154,6 @@ export class AuthService {
       return null;
     }
   }
-
-  // ── Helpers de localStorage seguros para SSR ─────────────────
 
   private leerStorage(key: string): string | null {
     return this.esBrowser ? localStorage.getItem(key) : null;
