@@ -23,8 +23,8 @@ export class AuthService {
   private esBrowser   = isPlatformBrowser(inject(PLATFORM_ID));
 
   private readonly API_URL   = `${environment.apiUrl}/auth`;
-  private readonly TOKEN_KEY = 'rcc_token';
-  private readonly USER_KEY  = 'rcc_user';
+  private readonly TOKEN_KEY = 'chispas_token';
+  private readonly USER_KEY  = 'chispas_user';
 
   public token       = signal<string | null>(this.leerStorage(this.TOKEN_KEY));
   public currentUser = signal<User | null>(this.getUserFromStorage());
@@ -33,6 +33,7 @@ export class AuthService {
   public userRole        = computed(() => this.currentUser()?.role ?? null);
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
+    /*
     // --- INICIO MOCK LOGIN ---
     console.warn('⚠️ ATENCIÓN: Usando Login Mockeado (Modo Desarrollo)');
     
@@ -61,12 +62,11 @@ export class AuthService {
       tap(res => this.saveSession(res.token))
     );
     // --- FIN MOCK LOGIN ---
-
-    /* --- CÓDIGO REAL (Descomentar cuando el back funcione) ---
+    ----------------------------------------------------------- */
     return this.http
       .post<AuthResponse>(`${this.API_URL}/login`, credentials)
       .pipe(tap(res => this.saveSession(res.token)));
-    ----------------------------------------------------------- */
+    
   }
 
   registrarUsuario(datos: UsuarioCreateRequest): Observable<AuthResponse> {

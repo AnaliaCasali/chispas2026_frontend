@@ -21,14 +21,14 @@ export const routes: Routes = [
     canActivate: [guestGuard]
   },
   {
-  path: 'actividad/relacionar',
-  loadComponent: () => import('./features/actividades/actividad-relacionar/actividad-relacionar').then((m) => m.ActividadRelacionarComponent),
-  canActivate: [authGuard]
+    path: 'actividad/relacionar',
+    loadComponent: () => import('./features/actividades/actividad-relacionar/actividad-relacionar').then((m) => m.ActividadRelacionarComponent),
+    canActivate: [authGuard]
   },
   {
     path: 'inicio',
     loadComponent: () => import('./features/components/inicio/inicio').then((m) => m.Inicio),
-    canActivate: [guestGuard],
+    canActivate: [authGuard],
   },
   // Comodín para URLs no encontradas
   {
