@@ -20,15 +20,15 @@ export const routes: Routes = [
     loadComponent: () => import('./features/login/login').then(m => m.LoginComponent),
     canActivate: [guestGuard]
   },
-  {
+  /*{
     path: 'actividad/relacionar',
     loadComponent: () => import('./features/actividades/actividad-relacionar/actividad-relacionar').then((m) => m.ActividadRelacionarComponent),
     canActivate: [authGuard]
-  },
+  },*/
   {
-    path: 'inicio',
-    loadComponent: () => import('./features/components/inicio/inicio').then((m) => m.Inicio),
-    canActivate: [authGuard],
+  path: 'inicio',
+  loadComponent: () => import('./features/inicio/inicio').then((m) => m.InicioComponent),
+  //canActivate: [authGuard],
   },
   // Comodín para URLs no encontradas
   {
