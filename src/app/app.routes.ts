@@ -26,6 +26,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'actividad/ordenar',
+    loadComponent: () => import('./features/actividades/actividad-ordenar/actividad-ordenar').then((m) => m.ActividadOrdenarComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'inicio',
     loadComponent: () => import('./features/components/inicio/inicio').then((m) => m.Inicio),
     canActivate: [authGuard],
