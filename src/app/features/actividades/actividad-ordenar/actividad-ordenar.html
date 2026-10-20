@@ -1,0 +1,120 @@
+<div class="ordenar-contenedor">
+  
+  <!-- Contenedor que agrupa ambas cabeceras pegadas como en Figma -->
+  <div class="contenedor-cabeceras">
+    <!-- Tarjeta Cabecera Materia -->
+    <div class="header-card materia-card">
+      <div class="icono-fondo cyan">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32"><path d="M10 4H4C2.89 4 2.01 4.89 2.01 6L2 18C2 19.11 2.89 20 4 20H20C21.11 20 22 19.11 22 18V8C22 6.89 21.11 6 20 6H12L10 4Z"/></svg>
+      </div>
+      <div class="texto-header">
+        <h2>LENGUA Y LITERATURA</h2>
+        <p>Don Quijote de la Mancha</p>
+      </div>
+    </div>
+
+    <!-- Tarjeta Cabecera Actividad -->
+    <div class="header-card actividad-card">
+      <div class="actividad-info">
+        <div class="icono-fondo purple">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+        </div>
+        <div class="texto-header">
+          <h2>ACTIVIDAD</h2>
+          <p>ORDENAR LA HISTORIA</p>
+        </div>
+      </div>
+      <div class="separador"></div>
+      <p class="consigna">ARRASTRÁ LAS IMÁGENES EN ORDEN</p>
+    </div>
+  </div>
+
+  <!-- Zona de Imágenes Disponibles (Soporta ratón y touch) -->
+  <div class="grilla-imagenes"
+       (dragover)="onDragOver($event)"
+       (drop)="onDropEnDisponibles($event)">
+    @for (img of disponibles(); track img.id) {
+      <div class="item-imagen" 
+           draggable="true"
+           [class.seleccionada]="imagenSeleccionada()?.id === img.id"
+           [class.arrastrando]="imagenArrastrada()?.img?.id === img.id"
+           (dragstart)="onDragStart($event, img)"
+           (dragend)="onDragEnd()"
+           (touchstart)="onTouchStart($event, img)"
+           (touchmove)="onTouchMove($event)"
+           (touchend)="onTouchEnd($event)"
+           (click)="seleccionarImagen(img)">
+        <div class="img-wrapper">
+          <img [src]="img.url" [alt]="img.titulo">
+        </div>
+        <span class="titulo-imagen">{{img.titulo}}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Casilleros de Destino (Drop zones con data-index para touch y mouse) -->
+  <div class="grilla-casilleros">
+    @for (item of casilleros(); track $index) {
+      <div class="casillero" 
+           [attr.data-index]="$index"
+           [class.vacio]="!item" 
+           [class.resaltado]="imagenSeleccionada() && !item"
+           [class.drag-sobre]="casilleroHover() === $index"
+           (dragover)="onDragOver($event, $index)"
+           (dragleave)="onDragLeave()"
+           (drop)="onDropEnCasillero($event, $index)"
+           (click)="asignarACasillero($index)">
+        @if (item) {
+          <div class="item-imagen"
+               draggable="true"
+               [class.arrastrando]="imagenArrastrada()?.img?.id === item.id"
+               (dragstart)="onDragStart($event, item, $index)"
+               (dragend)="onDragEnd()"
+               (touchstart)="onTouchStart($event, item, $index)"
+               (touchmove)="onTouchMove($event)"
+               (touchend)="onTouchEnd($event)">
+            <div class="img-wrapper">
+              <img [src]="item.url" [alt]="item.titulo">
+            </div>
+            <span class="titulo-imagen">{{item.titulo}}</span>
+          </div>
+        } @else {
+          <span class="numero">{{ $index + 1 }}</span>
+        }
+      </div>
+    }
+  </div>
+
+    <!-- Alertas de error o advertencia durante el juego -->
+  @if (mensaje().texto && mensaje().tipo === 'error') {
+    <div class="mensaje-alerta error">
+      {{ mensaje().texto }}
+    </div>
+  }
+
+  <!-- Botón de acción durante el juego -->
+  @if (!actividadTerminada()) {
+    <div class="controles-acciones">
+      <button class="btn-terminar" (click)="terminar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+        TERMINAR
+      </button>
+    </div>
+  }
+
+  <!-- Pantalla de Éxito con Botones de Guardar y Reintentar -->
+  <app-actividad-exito
+    [visible]="mostrarExito()"
+    [aciertos]="4"
+    [total]="4"
+    [guardando]="guardando()"
+    [guardadoExitoso]="guardadoExitoso()"
+    rutaActividad="/actividad/ordenar"
+    (guardar)="guardarResultado()"
+    (reiniciar)="reintentar()"
+    (continuar)="irAInicio()">
+  </app-actividad-exito>
+
+</div>
