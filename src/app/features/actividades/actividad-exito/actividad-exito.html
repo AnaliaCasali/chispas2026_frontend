@@ -1,0 +1,82 @@
+@if (visible()) {
+  <div class="exito-backdrop">
+    <div class="exito-card" (click)="$event.stopPropagation()">
+      
+      <!-- Efecto de Chispas -->
+      <div class="chispas-contenedor" aria-hidden="true">
+        @for (c of chispas; track c.id) {
+          <span class="chispa"
+                [style.--color]="c.color"
+                [style.--rotacion]="c.rotacion"
+                [style.--distancia]="c.distancia"
+                [style.--retraso]="c.retraso"
+                [style.--tamano]="c.tamano">
+          </span>
+        }
+      </div>
+
+      <!-- Icono Central de Trofeo y Estrellas -->
+      <div class="icono-trofeo-wrapper">
+        <div class="halo-pulsante"></div>
+        <div class="trofeo-circulo">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="56" height="56">
+            <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1c1.63-.44 2.96-1.55 3.61-3.06C19.08 12.53 21 10.47 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+          </svg>
+        </div>
+        <span class="estrella-flotante est-1">★</span>
+        <span class="estrella-flotante est-2">✦</span>
+        <span class="estrella-flotante est-3">★</span>
+      </div>
+
+      <!-- Textos -->
+      <h2 class="exito-titulo">{{ titulo() }}</h2>
+      <p class="exito-mensaje">{{ mensaje() }}</p>
+
+      <!-- Badge de Aciertos -->
+      @if (aciertos() !== null && total() !== null) {
+        <div class="badge-puntaje">
+          <span>🎯 Aciertos: <strong>{{ aciertos() }} / {{ total() }}</strong></span>
+        </div>
+      }
+
+      <!-- Botones de Acción dentro de la Pantalla de Éxito -->
+      <div class="exito-acciones">
+        <!-- Botón Guardar Resultado -->
+        <button type="button" 
+                class="btn-modal btn-guardar" 
+                (click)="onGuardar()" 
+                [disabled]="guardando() || guardadoExitoso()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          @if (guardando()) {
+            GUARDANDO...
+          } @else if (guardadoExitoso()) {
+            ¡GUARDADO CON ÉXITO! ✓
+          } @else {
+            GUARDAR RESULTADO
+          }
+        </button>
+
+        <!-- Botón Volver a Intentar / Reintentar la Actividad -->
+        <button type="button" class="btn-modal btn-reintentar" (click)="onReiniciar()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          VOLVER A INTENTAR
+        </button>
+
+        <!-- Botón Volver al Inicio (opcional si ya guardó) -->
+        @if (guardadoExitoso()) {
+          <button type="button" class="btn-modal btn-inicio" (click)="onContinuar()">
+            IR AL INICIO
+          </button>
+        }
+      </div>
+
+    </div>
+  </div>
+}
