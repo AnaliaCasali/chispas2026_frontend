@@ -26,9 +26,14 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },*/
   {
-  path: 'inicio',
-  loadComponent: () => import('./features/inicio/inicio').then((m) => m.InicioComponent),
-  //canActivate: [authGuard],
+    path: 'actividad/ordenar',
+    loadComponent: () => import('./features/actividades/actividad-ordenar/actividad-ordenar').then((m) => m.ActividadOrdenarComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'inicio',
+    loadComponent: () => import('./features/inicio/inicio').then((m) => m.InicioComponent),
+    //canActivate: [authGuard],
   },
   // Comodín para URLs no encontradas
   {
