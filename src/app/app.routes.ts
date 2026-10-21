@@ -51,7 +51,10 @@ export const routes: Routes = [
       import('./features/components/actividades-materia/actividades-materia')
         .then((m) => m.ActividadesMateriaComponent),
     canActivate: [authGuard],
-  },
+    path: 'actividad/ordenar',
+    loadComponent: () => import('./features/actividades/actividad-ordenar/actividad-ordenar').then((m) => m.ActividadOrdenarComponent),
+    canActivate: [authGuard]
+  }, 
   // Comodín para URLs no encontradas
   {
     path: '**',
