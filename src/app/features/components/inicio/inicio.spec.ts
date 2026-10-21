@@ -1,18 +1,34 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Inicio } from './inicio';
+import { provideRouter } from '@angular/router';
+import { of } from 'rxjs';
+import { InicioComponent } from './inicio';
+import { InicioService } from '../../services/inicio.service';
 
-describe('Inicio', () => {
-  let component: Inicio;
-  let fixture: ComponentFixture<Inicio>;
+describe('InicioComponent', () => {
+  let component: InicioComponent;
+  let fixture: ComponentFixture<InicioComponent>;
+
+  // Mock básico del servicio para no disparar peticiones HTTP reales durante las pruebas
+  const inicioServiceMock = {
+    obtenerInicio: () => of({
+      hayClaseAhora: false,
+      mensaje: 'Ahora no tienes clases',
+      materias: []
+    })
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Inicio],
+      imports: [InicioComponent],
+      providers: [
+        provideRouter([]),
+        { provide: InicioService, useValue: inicioServiceMock }
+      ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Inicio);
+    fixture = TestBed.createComponent(InicioComponent);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
   it('should create', () => {
