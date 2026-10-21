@@ -36,7 +36,7 @@ export const routes: Routes = [
   {
   path: 'inicio',
   loadComponent: () => import('./features/components/inicio/inicio').then((m) => m.InicioComponent),
-  canActivate: [authGuard],
+  canActivate: [authGuard]
   },
   {
     path: 'mi-carpeta',
