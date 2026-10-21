@@ -1,0 +1,128 @@
+@if (mostrarMenu()) {
+  <nav class="barra-navegacion">
+    
+    <!-- Encabezado con Identidad y Perfil del Alumno -->
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="#00a8e8">
+          <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+        </svg>
+        <div class="brand-text">
+          <h2>CHISPAS INCLUSIVAS</h2>
+          <p>Carpeta Digital</p>
+        </div>
+      </div>
+
+      <!-- Tarjeta de Usuario Conectado (Escritorio) -->
+      <div class="tarjeta-usuario-sesion">
+        <div class="avatar-usuario">
+          @if (usuario.foto) {
+            <img [src]="usuario.foto" alt="Foto de perfil" />
+          } @else {
+            <!-- Inicial o avatar inclusivo -->
+            <span class="inicial-avatar">{{ usuario.nombre.charAt(0).toUpperCase() }}</span>
+          }
+          <span class="punto-online" title="Conectado"></span>
+        </div>
+        <div class="info-usuario-sesion">
+          <span class="nombre-usuario">{{ usuario.nombre }}</span>
+          <span class="rol-usuario">Estudiante</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enlaces de Navegación -->
+    <div class="nav-links">
+      <a routerLink="/inicio" routerLinkActive="activo" class="item-navegacion">
+        <div class="envoltorio-icono">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+        <span class="label-texto">Inicio</span>
+      </a>
+
+      <a routerLink="/mi-carpeta" routerLinkActive="activo" class="item-navegacion">
+        <div class="envoltorio-icono">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <span class="label-texto">Mis Materias</span>
+      </a>
+
+      <a routerLink="/horarios" routerLinkActive="activo" class="item-navegacion">
+        <div class="envoltorio-icono">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <span class="label-texto">Horarios</span>
+      </a>
+
+      <a routerLink="/perfil" routerLinkActive="activo" class="item-navegacion">
+        <div class="envoltorio-icono">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <span class="label-texto">Mi Perfil</span>
+      </a>
+
+      <!-- Botón móvil: cambia cerrarSesion() por solicitarCerrarSesion() -->
+      <a (click)="solicitarCerrarSesion()" class="item-navegacion item-logout-movil" style="cursor: pointer;">
+        <div class="envoltorio-icono">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </div>
+        <span class="label-texto">Salir</span>
+      </a>
+    </div>
+
+    <!-- Botón escritorio: cambia cerrarSesion() por solicitarCerrarSesion() -->
+    <div class="sidebar-footer">
+      <button class="btn-logout" (click)="solicitarCerrarSesion()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        <span>Cerrar sesión</span>
+      </button>
+    </div>
+  </nav>
+  <!-- Modal de confirmación -->
+    @if (mostrarModalConfirmacion()) {
+      <div class="overlay-modal" (click)="cancelarCerrarSesion()">
+        <div class="tarjeta-modal" (click)="$event.stopPropagation()">
+          <div class="icono-alerta-modal">
+            <svg width="32" height="32" fill="none" stroke="#ef4444" stroke-width="2.5" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+
+          <h3>¿Cerrar sesión?</h3>
+          <p>Vas a salir de tu cuenta. Para volver a ver tus materias tendrás que iniciar sesión otra vez.</p>
+
+          <div class="acciones-modal">
+            <button type="button" class="btn-modal-cancelar" (click)="cancelarCerrarSesion()">
+              Seguir aquí
+            </button>
+            <button type="button" class="btn-modal-salir" (click)="confirmarCerrarSesion()">
+              Sí, salir
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+}

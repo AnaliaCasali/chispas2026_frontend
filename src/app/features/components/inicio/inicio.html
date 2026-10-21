@@ -1,1 +1,107 @@
-<p>inicio works!</p>
+<div class="contenedor-movil">
+
+  <!-- Header Superior -->
+  <header class="encabezado-superior">
+    <div class="logo-encabezado">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="#00a8e8">
+        <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+      </svg>
+    </div>
+    <div class="texto-encabezado">
+      <h1>CARPETA DIGITAL</h1>
+      <p>Tu escuela organizada</p>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="cuerpo-contenido">
+    
+    @if (cargando()) {
+      <div class="estado-mensaje">
+        <p>Cargando cronograma escolar...</p>
+      </div>
+    } @else if (error()) {
+      <div class="estado-mensaje error">
+        <p>{{ error() }}</p>
+        <button class="btn-reintentar" (click)="cargarDatosInicio()">Reintentar</button>
+      </div>
+    } @else {
+      <!-- Pastilla con la hora actual -->
+      <div class="contenedor-pastilla-hora">
+        <div class="pastilla-hora">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>{{ horaActualTexto() }}</span>
+        </div>
+      </div>
+
+      <!-- ESCENARIO 3: Tarjeta destacada de clase en curso -->
+      @if (materiaActual(); as materia) {
+        <section class="tarjeta-clase" [style.borderLeftColor]="materia.color || '#2563eb'">
+          <div class="cabecera-tarjeta">
+            <div class="burbuja-icono" [style.backgroundColor]="materia.color ? materia.color + '22' : '#c7d2fe'">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="#1e3a8a">
+                <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+              </svg>
+            </div>
+            <div class="titulos-clase">
+              <span class="etiqueta-ahora">AHORA:</span>
+              <h2 class="titulo-materia">{{ materia.nombre }}</h2>
+            </div>
+          </div>
+
+          <div class="detalles-clase">
+            @if (materia.actividadPrincipal; as act) {
+              <div class="fila-detalle">
+                <span class="etiqueta-detalle">Actividad:</span>
+                <span class="valor-detalle">{{ act.titulo }}</span>
+              </div>
+              <div class="fila-detalle">
+                <span class="etiqueta-detalle">Estado:</span>
+                <span class="valor-detalle badge-estado">{{ act.estado }}</span>
+              </div>
+            } @else {
+              <div class="fila-detalle">
+                <span class="valor-detalle">{{ materia.mensaje || 'Sin actividades asignadas en este momento.' }}</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Botón ABRIR CLASE -->
+        <button class="boton-accion-principal" (click)="abrirClaseActual()">
+          <span>ABRIR CLASE</span>
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      } @else {
+        <!-- Mensaje cuando no hay clase activa en el momento -->
+        <div class="alerta-sin-clase">
+          <p>{{ datosInicio()?.mensaje || 'No hay clases en curso en este momento.' }}</p>
+        </div>
+      }
+
+      <!-- Botones de Navegación Secundaria (Escenario 2) -->
+      <div class="acciones-secundarias">
+        <button class="boton-secundario" routerLink="/horarios">
+          <span>Ver Horarios</span>
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+
+      <button class="boton-secundario" routerLink="/mi-carpeta">
+        <span>Mis Materias</span>
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+      </div>
+    }
+  </main> 

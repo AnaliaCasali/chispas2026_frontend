@@ -12,8 +12,16 @@ export const routes: Routes = [
 
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'bienvenida',
     pathMatch: 'full',
+  },
+  {
+    path: 'bienvenida',
+    loadComponent: () =>
+      import('./features/components/bienvenida/bienvenida').then(
+        (m) => m.BienvenidaComponent
+      ),
+    canActivate: [guestGuard], // Si ya está logueado, guestGuard lo manda directo a /inicio
   },
   {
     path: 'login',
@@ -27,12 +35,27 @@ export const routes: Routes = [
   },*/
   {
   path: 'inicio',
-  loadComponent: () => import('./features/inicio/inicio').then((m) => m.InicioComponent),
-  //canActivate: [authGuard],
+  loadComponent: () => import('./features/components/inicio/inicio').then((m) => m.InicioComponent),
+  canActivate: [authGuard],
+  },
+  {
+    path: 'mi-carpeta',
+    loadComponent: () =>
+      import('./features/components/mi-carpeta/mi-carpeta')
+        .then((m) => m.MiCarpetaComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'mi-carpeta/materias/:id/actividades',
+    loadComponent: () =>
+      import('./features/components/actividades-materia/actividades-materia')
+        .then((m) => m.ActividadesMateriaComponent),
+    canActivate: [authGuard],
   },
   // Comodín para URLs no encontradas
   {
     path: '**',
     redirectTo: 'login',
   },
+  
 ];
