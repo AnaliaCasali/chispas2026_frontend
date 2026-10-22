@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import {
@@ -29,6 +29,7 @@ export class ActividadOrdenarComponent implements OnInit {
   private authService = inject(AuthService);
   private actividadService = inject(ActividadService);
   private esBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private location = inject(Location);
 
   audioHabilitado = signal<boolean>(true);
 
@@ -78,8 +79,31 @@ export class ActividadOrdenarComponent implements OnInit {
     const idParam = this.route.snapshot.paramMap.get('tareaId') || this.route.snapshot.queryParamMap.get('tareaId');
     if (idParam) {
       this.tareaId.set(Number(idParam));
+      this.cargarDatosBackend(Number(idParam));
+    } else {
+      this.reintentar();
     }
-    this.reintentar();
+  }
+
+  cargarDatosBackend(tareaId: number): void {
+  this.actividadService.obtenerDetalle(tareaId).subscribe({
+    next: (detalle) => {
+      // Cargamos las imágenes dinámicas del backend
+      this.imagenesBase = detalle.items.map(item => ({
+        id: item.itemId,
+        titulo: item.titulo,
+        url: item.imagenUrl
+      }));
+      this.totalItems.set(detalle.items.length);
+      // Ajustamos la cantidad de casilleros disponibles a la cantidad de items
+      this.casilleros.set(new Array(detalle.items.length).fill(null));
+      this.reintentar();
+    },
+    error: (err) => {
+      console.error('Error al cargar detalle de la tarea:', err);
+      this.reintentar(); // Fallback
+    }
+  });
   }
 
   // Interacción por clic/tap
@@ -309,8 +333,12 @@ export class ActividadOrdenarComponent implements OnInit {
     this.mensaje.set({ texto: '', tipo: null });
   }
 
-  irAInicio() {
-    this.router.navigate(['/inicio']);
+  volver(): void {
+    if (this.esBrowser && window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/mi-carpeta']);
+    }
   }
 
     leerTexto(texto: string): void {

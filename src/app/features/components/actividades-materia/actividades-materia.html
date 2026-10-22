@@ -1,6 +1,5 @@
 <div class="contenedor-materia">
-
-  <!-- Header / Barra superior con regreso y título de materia -->
+  <!-- Header con color de la materia -->
   <header class="encabezado-materia" [style.backgroundColor]="datosMateria()?.color || '#2563eb'">
     <button class="btn-volver" routerLink="/mi-carpeta">
       <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -10,49 +9,62 @@
     </button>
     <div class="info-encabezado">
       <h1>{{ datosMateria()?.materia || 'Cargando materia...' }}</h1>
-      <span class="subtitulo">Tareas asignadas</span>
+      <span class="subtitulo">Tareas de la carpeta</span>
     </div>
   </header>
-
+  <!-- Pestañas de Filtro -->
+  @if (!cargando() && !errorCarga() && datosMateria()?.actividades?.length) {
+    <nav class="barra-filtros">
+      <button 
+        class="tab-filtro" 
+        [class.activo]="filtroActual() === 'todas'" 
+        (click)="cambiarFiltro('todas')">
+        Todas ({{ datosMateria()?.actividades?.length }})
+      </button>
+      <button 
+        class="tab-filtro" 
+        [class.activo]="filtroActual() === 'pendientes'" 
+        (click)="cambiarFiltro('pendientes')">
+        Pendientes ({{ totalPendientes() }})
+      </button>
+      <button 
+        class="tab-filtro" 
+        [class.activo]="filtroActual() === 'realizadas'" 
+        (click)="cambiarFiltro('realizadas')">
+        Realizadas ({{ totalRealizadas() }})
+      </button>
+    </nav>
+  }
   <main class="cuerpo-tareas">
-
-    <!-- Estado de Carga -->
     @if (cargando()) {
       <div class="estado-mensaje">
         <p>Cargando tareas de la materia...</p>
       </div>
     }
-
-    <!-- Escenario 8: Error de conexión con botón Reintentar -->
     @else if (errorCarga()) {
       <div class="estado-error">
-        <svg width="44" height="44" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
         <p class="texto-error">No pudimos cargar las tareas</p>
         <button class="btn-reintentar" (click)="cargarActividades()">Reintentar</button>
       </div>
     }
-
-    <!-- Escenario 7: Materia sin tareas asignadas -->
-    @else if (!datosMateria()?.actividades?.length) {
+    @else if (!actividadesFiltradas().length) {
       <div class="estado-vacio">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="#94a3b8">
-          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-        </svg>
-        <p>{{ datosMateria()?.mensaje || 'Todavía no hay tareas en esta materia' }}</p>
+        <p>
+          @if (filtroActual() === 'realizadas') {
+            Todavía no has realizado ninguna actividad en esta materia.
+          } @else if (filtroActual() === 'pendientes') {
+            ¡Genial! No tenés actividades pendientes en esta materia.
+          } @else {
+            {{ datosMateria()?.mensaje || 'Todavía no hay tareas en esta materia' }}
+          }
+        </p>
       </div>
     }
-
-    <!-- Listado de tareas (Escenarios 1, 2, 3, 4, 5, 6) -->
     @else {
       <div class="lista-tareas">
-        @for (tarea of datosMateria()!.actividades; track tarea.tareaId) {
-          <article class="tarjeta-tarea" (click)="abrirTarea(tarea)">
+        @for (tarea of actividadesFiltradas(); track tarea.tareaId) {
+          <article class="tarjeta-tarea" [class.es-realizada]="tarea.realizada" (click)="abrirTarea(tarea)">
             
-            <!-- Imagen / Portada de la tarea -->
             <div class="contenedor-portada">
               @if (tarea.imagenUrl) {
                 <img [src]="tarea.imagenUrl" [alt]="tarea.titulo" class="imagen-tarea" />
@@ -64,58 +76,77 @@
                 </div>
               }
             </div>
-
-            <!-- Información detallada -->
             <div class="detalle-tarea">
-              
               <div class="fila-meta">
-                <!-- Escenario 4: Etiqueta HOY -->
                 @if (tarea.esHoy) {
                   <span class="badge-hoy">HOY</span>
                 }
-
                 @if (tarea.tipoActividad?.nombre) {
                   <span class="tipo-actividad">{{ tarea.tipoActividad?.nombre }}</span>
                 }
-
                 <span class="fecha-asignacion">{{ formatearFecha(tarea.fechaAsignacion) }}</span>
               </div>
-
               <h2 class="titulo-tarea">{{ tarea.titulo }}</h2>
-
-              <!-- Escenario 5: Estado Realizada vs Pendiente -->
               <div class="estado-tarea">
                 @if (tarea.realizada) {
                   <span class="badge-estado realizada">
                     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Realizada
+                    Realizada · Ver resultado
                   </span>
                 } @else {
                   <span class="badge-estado pendiente">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <polyline points="12 6 12 12 14 14"></polyline>
-                    </svg>
                     Pendiente
                   </span>
                 }
               </div>
-
             </div>
-
-            <!-- Flecha de apertura -->
             <div class="icono-abrir">
               <svg width="20" height="20" fill="none" stroke="#94a3b8" stroke-width="2.5" viewBox="0 0 24 24">
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </div>
-
           </article>
         }
       </div>
     }
-
   </main>
+  <!-- MODAL: Historial / Desempeño de Tarea Realizada -->
+  @if (historialSeleccionado()) {
+    <div class="modal-backdrop" (click)="cerrarModalHistorial()">
+      <div class="modal-contenido" (click)="$event.stopPropagation()">
+        
+        <header class="modal-header">
+          <h3>{{ tareaSeleccionadaTitulo() }}</h3>
+          <span class="badge-realizada-modal">¡Actividad Realizada!</span>
+        </header>
+        <div class="modal-cuerpo">
+          <div class="resultado-destacado">
+            <span class="puntuacion">
+              {{ historialSeleccionado()?.ultimoResultado?.aciertos }} / {{ historialSeleccionado()?.ultimoResultado?.totalItems }}
+            </span>
+            <span class="etiqueta-puntuacion">Aciertos conseguidos</span>
+            <p class="mensaje-felicitacion">{{ historialSeleccionado()?.ultimoResultado?.mensaje }}</p>
+          </div>
+          @if (historialSeleccionado()?.intentos?.length) {
+            <div class="seccion-intentos">
+              <h4>Historial de Intentos</h4>
+              <ul class="lista-intentos">
+                @for (intento of historialSeleccionado()!.intentos; track intento.intento) {
+                  <li class="item-intento">
+                    <span>Intento {{ intento.intento }}</span>
+                    <strong>{{ intento.aciertos }} de {{ intento.total }} aciertos</strong>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+        <footer class="modal-footer">
+          <button class="btn-cerrar-modal" (click)="cerrarModalHistorial()">Volver a la carpeta</button>
+        </footer>
+      </div>
+    </div>
+  }
 </div>
