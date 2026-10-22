@@ -1,0 +1,21 @@
+<main class="perfil">
+  <button type="button" (click)="volver()">← Volver</button>
+
+  @if (cargando()) {
+    <p>Cargando perfil...</p>
+  } @else if (error()) {
+    <p class="error-text">{{ error() }}</p>
+  } @else if (perfil(); as p) {
+    <h1>{{ p.nombre }} {{ p.apellido }}</h1>
+    <p><strong>Año que cursa:</strong> {{ p.curso ?? 'Sin curso asignado' }}</p>
+
+    <h2>Condición médica</h2>
+    @if (p.condiciones.length) {
+      <ul>
+        @for (c of p.condiciones; track c) { <li>{{ c }}</li> }
+      </ul>
+    } @else {
+      <p>{{ p.mensaje ?? 'Sin condición registrada' }}</p>
+    }
+  }
+</main>
