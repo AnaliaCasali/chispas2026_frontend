@@ -1,0 +1,386 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap');
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* ============================================================
+   CONTENEDOR RESPONSIVE
+   ============================================================ */
+.ordenar-contenedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: clamp(10px, 2vh, 18px);
+  width: 100%;
+  max-width: 880px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: clamp(12px, 2vh, 24px) clamp(14px, 3vw, 32px);
+  box-sizing: border-box;
+  background-color: #ffffff;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   CABECERAS
+   ============================================================ */
+.contenedor-cabeceras {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 620px;
+  gap: 8px;
+}
+
+.header-card {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 18px;
+  background-color: #edf4fe;
+}
+
+.materia-card {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 18px);
+  padding: clamp(8px, 1.4vh, 12px) clamp(14px, 2.5vw, 22px);
+}
+
+.icono-fondo.cyan {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #18b4e7;
+}
+
+.texto-header h2 {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 900;
+  color: #152348;
+  margin: 0;
+  letter-spacing: 0.2px;
+}
+
+.texto-header p {
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  color: #475569;
+  margin: 2px 0 0 0;
+  font-weight: 500;
+}
+
+.btn-audio-toggle {
+  margin-left: auto;
+  background-color: #ffffff;
+  border: 2px solid #18b4e7;
+  color: #18b4e7;
+  width: clamp(38px, 5vw, 44px);
+  height: clamp(38px, 5vw, 44px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(24, 180, 231, 0.25);
+  flex-shrink: 0;
+}
+
+.btn-audio-toggle:hover {
+  background-color: #18b4e7;
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+.btn-audio-toggle.silenciado {
+  border-color: #94a3b8;
+  color: #94a3b8;
+  box-shadow: none;
+}
+
+.actividad-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(10px, 1.6vh, 16px) clamp(14px, 2.5vw, 22px);
+}
+
+.actividad-info {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 18px);
+  width: 100%;
+}
+
+.icono-fondo.purple {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(42px, 5.5vw, 50px);
+  height: clamp(42px, 5.5vw, 50px);
+  border-radius: 50%;
+  background-color: #b2b5fc;
+  color: #1e295a;
+  flex-shrink: 0;
+}
+
+.separador {
+  width: 100%;
+  height: 2px;
+  background-color: #94a3b8;
+  margin: 10px 0 8px 0;
+  opacity: 0.65;
+}
+
+.consigna {
+  font-size: clamp(0.88rem, 1.3vw, 1.05rem);
+  font-weight: 900;
+  color: #0b132b;
+  text-align: center;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   TABLERO CENTRAL
+   ============================================================ */
+.tablero-unir {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: clamp(36px, 10vw, 110px);
+  width: 100%;
+  max-width: 780px;
+  margin: clamp(8px, 1.8vh, 20px) 0;
+  box-sizing: border-box;
+  --card-dim: clamp(85px, 14vw, 130px);
+}
+
+.svg-flechas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 5;
+}
+
+.linea-flecha {
+  stroke-width: clamp(4px, 0.6vw, 6px);
+  fill: none;
+  cursor: pointer;
+  pointer-events: stroke;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease;
+}
+
+.linea-flecha:hover {
+  stroke-width: 7px;
+}
+
+/* ============================================================
+   COLUMNAS
+   ============================================================ */
+.columna-items {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(12px, 2.2vh, 20px);
+  z-index: 10;
+}
+
+.columna-izq {
+  flex: 0 0 var(--card-dim);
+  width: var(--card-dim);
+}
+
+.columna-der {
+  flex: 1;
+  max-width: 440px;
+}
+
+/* Tarjeta Base */
+.item-tarjeta {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: #eef4fe;
+  border: clamp(2px, 0.35vw, 3px) solid #1e3b70;
+  border-radius: clamp(14px, 2vw, 20px);
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.item-tarjeta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(30, 59, 112, 0.22);
+}
+
+.item-tarjeta.seleccionada {
+  border-color: #2563eb;
+  background-color: #e0ecff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.38);
+  transform: scale(1.025);
+}
+
+.item-tarjeta.conectada {
+  border-color: #475569;
+}
+
+/* Estados de Corrección Sin Rojo */
+.item-tarjeta.conexion-correcta {
+  border-color: #10b981 !important;
+  background-color: #ecfdf5 !important;
+}
+
+/* Ámbar suave motivador en lugar de rojo punitivo */
+.item-tarjeta.conexion-revisar {
+  border-color: #f59e0b !important;
+  background-color: #fefce8 !important;
+}
+
+/* Columna Izquierda (Imagen) */
+.tarjeta-solo-imagen {
+  width: var(--card-dim);
+  height: var(--card-dim);
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  overflow: hidden;
+  background-color: #ffffff;
+  flex-shrink: 0;
+}
+
+.img-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  pointer-events: none;
+}
+
+/* Columna Derecha (Texto Breve) */
+.tarjeta-texto {
+  min-height: var(--card-dim);
+  height: var(--card-dim);
+  padding: clamp(8px, 1.5vh, 14px) clamp(14px, 2.5vw, 26px);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.texto-accion {
+  font-size: clamp(0.92rem, 1.7vw, 1.25rem);
+  font-weight: 800;
+  line-height: 1.3;
+  color: #10214c;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Conectores */
+.conector-punto {
+  position: absolute;
+  width: clamp(14px, 1.8vw, 18px);
+  height: clamp(14px, 1.8vw, 18px);
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: clamp(2.5px, 0.4vw, 3.5px) solid #1e3b70;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 15;
+  transition: transform 0.2s ease;
+}
+
+.item-tarjeta:hover .conector-punto {
+  transform: translateY(-50%) scale(1.25);
+}
+
+.conector-der {
+  right: calc(clamp(14px, 1.8vw, 18px) / -2);
+}
+
+.conector-izq {
+  left: calc(clamp(14px, 1.8vw, 18px) / -2);
+}
+
+/* ============================================================
+   ALERTA AMIGABLE (TONO AMARILLO CÁLIDO PASTEL)
+   ============================================================ */
+.mensaje-alerta-amigable {
+  width: 100%;
+  max-width: 540px;
+  padding: clamp(10px, 1.5vh, 14px) 18px;
+  font-size: clamp(0.92rem, 1.3vw, 1.05rem);
+  font-weight: 800;
+  text-align: center;
+  border-radius: 14px;
+  box-sizing: border-box;
+  background-color: #fefce8;
+  color: #854d0e;
+  border: 1.5px solid #fde047;
+  margin-bottom: 6px;
+  animation: fadeIn 0.2s ease;
+}
+
+/* ============================================================
+   BOTÓN TERMINAR
+   ============================================================ */
+.controles-acciones {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: clamp(6px, 1.5vh, 14px);
+}
+
+.btn-terminar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: clamp(210px, 28vw, 270px);
+  padding: clamp(12px, 1.8vh, 16px) clamp(22px, 3vw, 32px);
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  border-radius: 16px;
+  background-color: #2d74db;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 5px 16px rgba(45, 116, 219, 0.35);
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-terminar:hover {
+  background-color: #2361bc;
+  transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

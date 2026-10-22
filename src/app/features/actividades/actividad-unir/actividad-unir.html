@@ -1,0 +1,171 @@
+<div class="ordenar-contenedor">
+  
+  <!-- Cabeceras idénticas a Figma -->
+  <div class="contenedor-cabeceras">
+    <!-- Tarjeta Materia -->
+    <div class="header-card materia-card">
+      <div class="icono-fondo cyan">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+          <path d="M10 4H4C2.89 4 2.01 4.89 2.01 6L2 18C2 19.11 2.89 20 4 20H20C21.11 20 22 19.11 22 18V8C22 6.89 21.11 6 20 6H12L10 4Z"/>
+        </svg>
+      </div>
+      <div class="texto-header">
+        <h2>LENGUA Y LITERATURA</h2>
+        <p>Actividad Práctica</p>
+      </div>
+
+      <!-- Botón de Audio accesible -->
+      <button 
+        type="button" 
+        class="btn-audio-toggle" 
+        [class.silenciado]="!audioHabilitado()" 
+        (click)="toggleAudio()"
+        [title]="audioHabilitado() ? 'Voz activada' : 'Voz silenciada'">
+        @if (audioHabilitado()) {
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+          </svg>
+        }
+      </button>
+    </div>
+
+    <!-- Tarjeta Actividad -->
+    <div class="header-card actividad-card">
+      <div class="actividad-info">
+        <div class="icono-fondo purple">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+            <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+          </svg>
+        </div>
+        <div class="texto-header">
+          <h2>ACTIVIDAD</h2>
+          <p>RELACIÓN CON IMÁGENES</p>
+        </div>
+      </div>
+      <div class="separador"></div>
+      <p class="consigna">UNIR CON FLECHAS</p>
+    </div>
+  </div>
+
+  <!-- Tablero Central -->
+  <div #tablero class="tablero-unir">
+    
+    <!-- SVG de Flechas -->
+    <svg class="svg-flechas">
+      <defs>
+        <marker id="flecha-azul" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+        </marker>
+        <marker id="flecha-naranja" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b" />
+        </marker>
+        <marker id="flecha-verde" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+        </marker>
+        <marker id="flecha-rosa" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#ec4899" />
+        </marker>
+
+        <!-- Flechas de Corrección: Verde (acierto) y Ámbar cálido (a revisar, SIN ROJO) -->
+        <marker id="flecha-correcta" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+        </marker>
+        <marker id="flecha-revisar" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b" />
+        </marker>
+      </defs>
+
+      @for (c of conexiones(); track c.id) {
+        <path
+          [attr.d]="calcularPathCurva(c)"
+          class="linea-flecha"
+          [class.linea-correcta]="c.estado === 'correcta'"
+          [class.linea-revisar]="c.estado === 'revisar'"
+          [attr.stroke]="c.estado === 'correcta' ? '#10b981' : (c.estado === 'revisar' ? '#f59e0b' : c.color)"
+          [attr.marker-end]="'url(#flecha-' + (c.estado === 'correcta' ? 'correcta' : (c.estado === 'revisar' ? 'revisar' : c.colorNombre)) + ')'"
+          (click)="eliminarConexion(c)"
+        />
+      }
+    </svg>
+
+    <!-- Columna Izquierda: SOLO IMÁGENES -->
+    <div class="columna-items columna-izq">
+      @for (img of imagenes; track img.id) {
+        <div 
+          class="item-tarjeta tarjeta-solo-imagen"
+          [class.seleccionada]="imagenSeleccionada()?.id === img.id"
+          [class.conectada]="!!getConexionDeImagen(img.id)"
+          [class.conexion-correcta]="getConexionDeImagen(img.id)?.estado === 'correcta'"
+          [class.conexion-revisar]="getConexionDeImagen(img.id)?.estado === 'revisar'"
+          (click)="seleccionarImagen(img)"
+        >
+          <div class="img-container">
+            <img [src]="img.url" [alt]="img.texto">
+          </div>
+
+          <div [id]="'dot-izq-' + img.id" class="conector-punto conector-der"
+               [style.border-color]="getConexionDeImagen(img.id)?.color || '#1e3b70'"></div>
+        </div>
+      }
+    </div>
+
+    <!-- Columna Derecha: ACCIONES BREVES -->
+    <div class="columna-items columna-der">
+      @for (accion of acciones; track accion.id) {
+        <div 
+          class="item-tarjeta tarjeta-texto"
+          [class.seleccionada]="accionSeleccionada()?.id === accion.id"
+          [class.conectada]="!!getConexionDeAccion(accion.id)"
+          [class.conexion-correcta]="getConexionDeAccion(accion.id)?.estado === 'correcta'"
+          [class.conexion-revisar]="getConexionDeAccion(accion.id)?.estado === 'revisar'"
+          (click)="seleccionarAccion(accion)"
+        >
+          <div [id]="'dot-der-' + accion.id" class="conector-punto conector-izq"
+               [style.border-color]="getConexionDeAccion(accion.id)?.color || '#1e3b70'"></div>
+
+          <p class="texto-accion">{{ accion.texto }}</p>
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- Alerta cálida (amarillo pastel) si faltan conectar elementos -->
+  @if (mensajeAlerta().texto) {
+    <div class="mensaje-alerta-amigable">
+      💡 {{ mensajeAlerta().texto }}
+    </div>
+  }
+
+  <!-- Botón Terminar idéntico a Figma -->
+  @if (!actividadTerminada()) {
+    <div class="controles-acciones">
+      <button class="btn-terminar" (click)="terminar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+        TERMINAR
+      </button>
+    </div>
+  }
+
+  <!-- Modal de Resultado/Éxito dinámico según Escenario 1, 2 o 3 -->
+  <app-actividad-exito
+    [visible]="mostrarExito()"
+    [titulo]="tituloModal()"
+    [mensaje]="mensajeModal()"
+    [aciertos]="aciertosObtenidos()"
+    [total]="4"
+    [guardando]="guardando()"
+    [guardadoExitoso]="guardadoExitoso()"
+    rutaActividad="/actividad/unir-con-flechas"
+    (guardar)="guardarManualmente()"
+    (reiniciar)="reintentar()"
+    (continuar)="irAInicio()">
+  </app-actividad-exito>
+
+</div>
