@@ -3,19 +3,20 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ActividadesMateriaDTO, MiCarpetaDTO } from '../models/inicio.model';
+import { environment } from '../../../environments/environment.production';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CarpetaService {
   private http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/v1/mi-carpeta';
+  private apiUrl = `${environment.apiUrl}/mi-carpeta`;
 
   obtenerMiCarpeta(): Observable<MiCarpetaDTO> {
-    return this.http.get<MiCarpetaDTO>(this.baseUrl);
+    return this.http.get<MiCarpetaDTO>(this.apiUrl);
   }
 
   obtenerActividadesDeMateria(carpetaEspacioId: number): Observable<ActividadesMateriaDTO> {
-    return this.http.get<ActividadesMateriaDTO>(`${this.baseUrl}/materias/${carpetaEspacioId}/actividades`);
+    return this.http.get<ActividadesMateriaDTO>(`${this.apiUrl}/materias/${carpetaEspacioId}/actividades`);
   }
 }

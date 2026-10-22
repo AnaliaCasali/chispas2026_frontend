@@ -1,0 +1,104 @@
+<div class="contenedor-horarios">
+
+  <!-- Encabezado con ícono azul circular -->
+  <header class="encabezado-horarios">
+    <div class="icono-calendario-header">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+        <circle cx="8" cy="14" r="1" fill="#ffffff"></circle>
+        <circle cx="12" cy="14" r="1" fill="#ffffff"></circle>
+        <circle cx="16" cy="14" r="1" fill="#ffffff"></circle>
+        <circle cx="8" cy="17" r="1" fill="#ffffff"></circle>
+        <circle cx="12" cy="17" r="1" fill="#ffffff"></circle>
+        <circle cx="16" cy="17" r="1" fill="#ffffff"></circle>
+      </svg>
+    </div>
+    <div class="texto-header">
+      <h1>HORARIOS</h1>
+      <p>Acá podés consultar tus horarios</p>
+    </div>
+  </header>
+
+  <main class="cuerpo-horarios">
+
+    <!-- Separador HOY -->
+    <div class="divisor-hoy">
+      <span class="label-hoy">
+        HOY {{ datosHorario()?.dia ? '(' + datosHorario()?.dia + ')' : '' }}
+      </span>
+      <div class="linea-divisor"></div>
+    </div>
+
+    <!-- Estado Cargando -->
+    @if (cargando()) {
+      <div class="estado-mensaje">
+        <p>Cargando tus horarios...</p>
+      </div>
+    } 
+    <!-- Estado Error con Reintento -->
+    @else if (errorCarga()) {
+      <div class="estado-error">
+        <svg width="44" height="44" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p>No pudimos cargar los horarios</p>
+        <button class="btn-reintentar" (click)="cargarHorarios()">Reintentar</button>
+      </div>
+    } 
+    <!-- Estado Vacío (Sin clases hoy o fin de semana) -->
+    @else if (!datosHorario()?.clases?.length) {
+      <div class="estado-vacio">
+        <div class="icono-descanso">☕</div>
+        <p class="titulo-vacio">{{ datosHorario()?.mensaje || 'Hoy no tienes clases programadas' }}</p>
+        <span class="subtexto-vacio">Aprovecha para descansar o repasar tus materias.</span>
+      </div>
+    } 
+    <!-- Lista de Clases de Hoy -->
+    @else {
+      <div class="lista-clases">
+        @for (clase of datosHorario()!.clases; track clase.espacioCurricularId) {
+          <article 
+            class="tarjeta-clase"
+            [class.en-curso]="clase.ahora"
+            [style.--color-materia]="clase.color || '#2563eb'"
+            (click)="abrirMateria(clase.carpetaEspacioId)">
+            
+            <!-- Círculo de la materia con el ícono temático -->
+            <div class="circulo-icono" [style.backgroundColor]="clase.color ? clase.color + '26' : '#e0f2fe'">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" [attr.stroke]="clase.color || '#2563eb'" stroke-width="1.8">
+                <!-- Ícono de libro abierto representativo -->
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+            </div>
+
+            <!-- Información de la clase -->
+            <div class="info-clase">
+              <div class="fila-titulo">
+                <h2 class="nombre-clase">{{ clase.materia }}</h2>
+                @if (clase.ahora) {
+                  <span class="badge-ahora">EN CURSO</span>
+                }
+              </div>
+
+              <div class="rango-horario">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>{{ formatearHora(clase.horaInicio) }} a {{ formatearHora(clase.horaFin) }}</span>
+              </div>
+            </div>
+
+          </article>
+        }
+      </div>
+    }
+
+  </main>
+</div>

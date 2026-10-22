@@ -19,13 +19,16 @@ export class NavegacionComponent {
   mostrarModalConfirmacion = signal<boolean>(false);
 
   get usuario() {
-    const user = this.authService.currentUser?.() as any;
-    const nombreMostrar = user?.nombre || user?.username || user?.email || 'Estudiante';
-    return {
-      nombre: String(nombreMostrar),
-      foto: user?.foto || null
-    };
-  }
+  const user = this.authService.currentUser?.() as any;
+
+  // Toma 'name' que viene de tu backend ("Mariel")
+  const nombreMostrar = user?.name || user?.nombre || user?.username || 'Estudiante';
+
+  return {
+    nombre: String(nombreMostrar),
+    foto: user?.foto || null
+  };
+}
 
   constructor() {
     this.actualizarVisibilidad(this.router.url);
