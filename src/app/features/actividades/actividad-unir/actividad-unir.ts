@@ -10,22 +10,24 @@ import {
   PLATFORM_ID
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { ActividadService, ResultadoActividad } from '../../../core/services/actividad.service';
+import {
+  ActividadService,
+  ItemRespuestaDTO,
+  ResultadoTareaDTO
+} from '../../../core/services/actividad.service';
 import { ActividadExitoComponent } from '../actividad-exito/actividad-exito';
 
 export interface ImagenUnir {
   id: number;
   texto: string;
   url: string;
-  parejaCorrectaId: number;
 }
 
 export interface AccionTextoUnir {
   id: number;
   texto: string;
-  parejaCorrectaId: number;
 }
 
 export interface ConexionUnir {
@@ -38,7 +40,7 @@ export interface ConexionUnir {
   y2: number;
   color: string;
   colorNombre: string;
-  estado?: 'normal' | 'correcta' | 'revisar'; // Cambiado 'incorrecta' por 'revisar'
+  estado?: 'normal' | 'correcta' | 'revisar';
 }
 
 @Component({
@@ -51,47 +53,56 @@ export interface ConexionUnir {
 export class ActividadUnirComponent implements OnInit, AfterViewInit {
   @ViewChild('tablero', { static: false }) tablero!: ElementRef<HTMLDivElement>;
 
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private authService = inject(AuthService);
   private actividadService = inject(ActividadService);
-  private router = inject(Router);
   private esBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+  // Tarea 2 en la base de datos es la actividad de Unir con Flechas de Don Quijote
+  tareaId = signal<number>(2);
 
   get esEstudiante(): boolean {
     return this.authService.isAuthenticated() && this.authService.getRol() === 'ESTUDIANTE';
   }
 
-  // Control de voz / accesibilidad
+  // Control de voz / accesibilidad (Lectura por síntesis de voz)
   audioHabilitado = signal<boolean>(true);
 
-  // Estados de la actividad
+  // Estados de control de la actividad
   guardando = signal<boolean>(false);
   actividadTerminada = signal<boolean>(false);
   mostrarExito = signal<boolean>(false);
   guardadoExitoso = signal<boolean>(false);
-  
-  // Datos del resultado para el Modal
-  aciertosObtenidos = signal<number>(0);
+  puedeReintentar = signal<boolean>(true);
+
+  // Datos para el Modal de Desempeño
+  aciertosObtenidos = signal<number | null>(null);
+  totalItems = signal<number>(4);
   tituloModal = signal<string>('¡Excelente trabajo!');
   mensajeModal = signal<string>('');
-  mensajeAlerta = signal<{ texto: string; tipo: 'info' | 'aviso' | null }>({ texto: '', tipo: null });
+  mensajeAlerta = signal<{ texto: string; tipo: 'info' | 'aviso' | 'error' | null }>({
+    texto: '',
+    tipo: null
+  });
 
-  // 1. Columna Izquierda: Imágenes
+  // 1. Columna Izquierda: 4 Imágenes de Don Quijote (IDs 10, 11, 12, 13 en la BD)
   imagenes: ImagenUnir[] = [
-    { id: 1, texto: 'Don Quijote lee un libro', url: 'assets/img/don-quijote-leyendo.png', parejaCorrectaId: 101 },
-    { id: 2, texto: 'Don Quijote sale de casa', url: 'assets/img/don-quijote-saliendo.png', parejaCorrectaId: 102 },
-    { id: 3, texto: 'Don Quijote ve un molino', url: 'assets/img/don-quijote-molino.png', parejaCorrectaId: 103 },
-    { id: 4, texto: 'Don Quijote vuelve a casa', url: 'assets/img/don-quijote-volviendo.png', parejaCorrectaId: 104 }
+    { id: 10, texto: 'Don Quijote lee un libro', url: 'http://localhost:8080/images/don-quijote-leyendo.webp' },
+    { id: 11, texto: 'Don Quijote sale de casa', url: 'http://localhost:8080/images/don-quijote-saliendo.webp' },
+    { id: 12, texto: 'Don Quijote ve un molino', url: 'http://localhost:8080/images/don-quijote-molino.webp' },
+    { id: 13, texto: 'Don Quijote vuelve a casa', url: 'http://localhost:8080/images/don-quijote-volviendo.webp' }
   ];
 
-  // 2. Columna Derecha: Frases breves
+  // 2. Columna Derecha: 4 Frases de Don Quijote (IDs 101, 102, 103, 104 en la BD)
   acciones: AccionTextoUnir[] = [
-    { id: 102, texto: 'Don Quijote sale de casa', parejaCorrectaId: 2 },
-    { id: 103, texto: 'Don Quijote ve un molino', parejaCorrectaId: 3 },
-    { id: 101, texto: 'Don Quijote lee un libro', parejaCorrectaId: 1 },
-    { id: 104, texto: 'Don Quijote vuelve a casa', parejaCorrectaId: 4 }
+    { id: 101, texto: 'Don Quijote sale de casa' },
+    { id: 102, texto: 'Don Quijote ve un molino' },
+    { id: 103, texto: 'Don Quijote lee un libro' },
+    { id: 104, texto: 'Don Quijote vuelve a casa' }
   ];
 
-  // Paleta armónica
+  // Paleta de colores para las flechas
   readonly PALETA = [
     { nombre: 'azul', hex: '#2563eb' },
     { nombre: 'naranja', hex: '#f59e0b' },
@@ -104,10 +115,16 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
   conexiones = signal<ConexionUnir[]>([]);
 
   ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('tareaId') || this.route.snapshot.queryParamMap.get('tareaId');
+    if (idParam) {
+      this.tareaId.set(Number(idParam));
+    }
     this.reintentar();
   }
 
-  ngAfterViewInit(): void {
+    ngAfterViewInit(): void {
+    if (!this.esBrowser) return;
+
     setTimeout(() => this.recalcularFlechas(), 150);
   }
 
@@ -216,7 +233,7 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
   }
 
   recalcularFlechas(): void {
-    if (!this.tablero) return;
+    if (!this.esBrowser || !this.tablero?.nativeElement?.getBoundingClientRect) return;
     const rectTablero = this.tablero.nativeElement.getBoundingClientRect();
     const lista = [...this.conexiones()];
 
@@ -248,13 +265,12 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
   }
 
   // ============================================================
-  // EVALUACIÓN SEGÚN LA HISTORIA DE USUARIO (3 ESCENARIOS)
+  // EVALUACIÓN Y PERSISTENCIA AUTOMÁTICA SEGÚN LA HISTORIA DE USUARIO
   // ============================================================
   terminar(): void {
-    // if (!this.esEstudiante) return;
     const conns = this.conexiones();
 
-    // Criterio: Debe completar todas las relaciones antes de terminar
+    // Criterio: Debe completar las 4 relaciones antes de terminar
     if (conns.length < this.imagenes.length) {
       const aviso = '¡Casi listo! Une las 4 imágenes con sus frases para ver tu resultado.';
       this.mensajeAlerta.set({ texto: aviso, tipo: 'aviso' });
@@ -262,70 +278,81 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    let correctas = 0;
-    conns.forEach(c => {
-      const img = this.imagenes.find(i => i.id === c.origenId);
-      const esCorrecta = img?.parejaCorrectaId === c.destinoId;
-      // Sin rojo: o es 'correcta' (verde) o es 'revisar' (ámbar suave)
-      c.estado = esCorrecta ? 'correcta' : 'revisar';
-      if (esCorrecta) correctas++;
-    });
-
-    this.conexiones.set([...conns]);
-    this.aciertosObtenidos.set(correctas);
-    this.actividadTerminada.set(true);
-
-    // Selección de mensaje según el Escenario de la HU
-    if (correctas === 4) {
-      // ESCENARIO 1: 4/4
-      this.tituloModal.set('¡Felicitaciones!');
-      this.mensajeModal.set('¡Muy bien! ¡Respondiste todo correctamente!');
-    } else if (correctas >= 2) {
-      // ESCENARIO 2: 3/4 o 2/4
-      this.tituloModal.set('¡Estuviste muy cerca!');
-      this.mensajeModal.set('¡Estuviste muy cerca! ¡Inténtalo de nuevo!');
-    } else {
-      // ESCENARIO 3: 1/4 o 0/4
-      this.tituloModal.set('¡Buen intento!');
-      this.mensajeModal.set('¡Buen intento! Cada vez que practicás, aprendés algo nuevo. ¡Volvé a intentarlo!');
-    }
-
-    // Abre la pantalla de desempeño y reproduce el mensaje motivador
-    this.mostrarExito.set(true);
-    this.leerTexto(this.mensajeModal());
-
-    // Se guarda automáticamente el resultado/intento como exige la HU
-    this.autoGuardarResultado(correctas);
-  }
-
-  private autoGuardarResultado(aciertos: number): void {
-    // Si no tiene sesión (modo test), no interrumpe la experiencia
-    if (!this.authService.isAuthenticated()) return;
+    // Armar el payload ItemRespuestaDTO para TareaServiceImpl
+    const items: ItemRespuestaDTO[] = conns.map(c => ({
+      itemId: c.origenId,         // Ítem izquierda
+      itemUnidoId: c.destinoId,   // Ítem derecha
+      posicionElegida: null
+    }));
 
     this.guardando.set(true);
-    const resultado: ResultadoActividad = {
-      actividadId: 1, // ID de la actividad de relacionar con flechas
-      respuestasCorrectas: aciertos,
-      totalPreguntas: 4,
-      completado: aciertos === 4
-    };
+    this.mensajeAlerta.set({ texto: '', tipo: null });
 
-    this.actividadService.guardarResultado(resultado).subscribe({
-      next: () => {
+    this.actividadService.entregarTarea(this.tareaId(), { items }).subscribe({
+      next: (resultado: ResultadoTareaDTO) => {
         this.guardando.set(false);
-        this.guardadoExitoso.set(true);
+        this.guardadoExitoso.set(true); // Persistido en el backend automáticamente
+
+        this.aciertosObtenidos.set(resultado.aciertos);
+        this.totalItems.set(resultado.totalItems);
+        this.mensajeModal.set(resultado.mensaje);
+        this.puedeReintentar.set(resultado.puedeIntentar);
+
+        const acertoTodo = resultado.aciertos === resultado.totalItems;
+
+        // Feedback en las flechas
+        conns.forEach(c => {
+          c.estado = acertoTodo ? 'correcta' : 'revisar';
+        });
+        this.conexiones.set([...conns]);
+
+        // Títulos de feedback acordes a los Escenarios 1, 2 y 3
+        if (acertoTodo) {
+          // ESCENARIO 1: 4/4 ("¡Felicitaciones respondiste todo correctamente!")
+          this.tituloModal.set('¡Felicitaciones!');
+          this.actividadTerminada.set(true);
+        } else if (resultado.aciertos >= 2) {
+          // ESCENARIO 2: 3/4 o 2/4 ("¡Estuviste muy cerca! ¡Inténtalo de nuevo!")
+          this.tituloModal.set('¡Estuviste muy cerca!');
+        } else {
+          // ESCENARIO 3: 1/4 o 0/4 ("¡Buen intento! Cada vez que practicás...")
+          this.tituloModal.set('¡Buen intento!');
+        }
+
+        // Abre el modal y reproduce por voz el mensaje devuelto por el servidor
+        this.mostrarExito.set(true);
+        this.leerTexto(resultado.mensaje);
+        const palabraAcierto = resultado.aciertos === 1 ? 'acierto' : 'aciertos';
+        const locucionCompleta = `${resultado.mensaje} Tuviste ${resultado.aciertos} ${palabraAcierto} de ${resultado.totalItems}.`;
+        this.leerTexto(locucionCompleta);
       },
-      error: () => {
+        error: (err) => {
         this.guardando.set(false);
-        // Fallo silencioso o advertencia suave para no alarmar al estudiante
+
+        if (err.status === 409) {
+          // Ocultar botón TERMINAR
+          this.actividadTerminada.set(true);
+          this.aciertosObtenidos.set(null); 
+
+          // Limpiar alertas del tablero
+          this.mensajeAlerta.set({ texto: '', tipo: null });
+
+          // Abrir modal con mensaje cordial
+          const msg = '¡Ya respondiste correctamente esta actividad anteriormente!';
+          this.tituloModal.set('¡Actividad ya completada!');
+          this.mensajeModal.set(msg);
+          this.guardadoExitoso.set(true);
+          this.mostrarExito.set(true);
+          this.leerTexto(msg);
+        } else {
+          const msg = err.error?.message || 'Ocurrió un error al enviar tu entrega.';
+          this.mensajeAlerta.set({ texto: msg, tipo: 'error' });
+        }
       }
     });
   }
 
-  guardarManualmente(): void {
-    this.autoGuardarResultado(this.aciertosObtenidos());
-  }
-
+  // Prepara el tablero para el siguiente intento (intento 2, 3...)
   reintentar(): void {
     this.conexiones.set([]);
     this.limpiarSelecciones();

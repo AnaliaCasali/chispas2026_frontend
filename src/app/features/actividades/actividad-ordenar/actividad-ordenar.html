@@ -1,120 +1,147 @@
-<div class="ordenar-contenedor">
-  
-  <!-- Contenedor que agrupa ambas cabeceras pegadas como en Figma -->
-  <div class="contenedor-cabeceras">
-    <!-- Tarjeta Cabecera Materia -->
-    <div class="header-card materia-card">
-      <div class="icono-fondo cyan">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32"><path d="M10 4H4C2.89 4 2.01 4.89 2.01 6L2 18C2 19.11 2.89 20 4 20H20C21.11 20 22 19.11 22 18V8C22 6.89 21.11 6 20 6H12L10 4Z"/></svg>
-      </div>
-      <div class="texto-header">
-        <h2>LENGUA Y LITERATURA</h2>
-        <p>Don Quijote de la Mancha</p>
-      </div>
-    </div>
+<div class="contenedor-pagina">
+  <div class="tarjeta-actividad-wrapper">
 
-    <!-- Tarjeta Cabecera Actividad -->
-    <div class="header-card actividad-card">
-      <div class="actividad-info">
-        <div class="icono-fondo purple">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
-        </div>
-        <div class="texto-header">
-          <h2>ACTIVIDAD</h2>
-          <p>ORDENAR LA HISTORIA</p>
-        </div>
-      </div>
-      <div class="separador"></div>
-      <p class="consigna">ARRASTRÁ LAS IMÁGENES EN ORDEN</p>
-    </div>
-  </div>
-
-  <!-- Zona de Imágenes Disponibles (Soporta ratón y touch) -->
-  <div class="grilla-imagenes"
-       (dragover)="onDragOver($event)"
-       (drop)="onDropEnDisponibles($event)">
-    @for (img of disponibles(); track img.id) {
-      <div class="item-imagen" 
-           draggable="true"
-           [class.seleccionada]="imagenSeleccionada()?.id === img.id"
-           [class.arrastrando]="imagenArrastrada()?.img?.id === img.id"
-           (dragstart)="onDragStart($event, img)"
-           (dragend)="onDragEnd()"
-           (touchstart)="onTouchStart($event, img)"
-           (touchmove)="onTouchMove($event)"
-           (touchend)="onTouchEnd($event)"
-           (click)="seleccionarImagen(img)">
-        <div class="img-wrapper">
-          <img [src]="img.url" [alt]="img.titulo">
-        </div>
-        <span class="titulo-imagen">{{img.titulo}}</span>
-      </div>
-    }
-  </div>
-
-  <!-- Casilleros de Destino (Drop zones con data-index para touch y mouse) -->
-  <div class="grilla-casilleros">
-    @for (item of casilleros(); track $index) {
-      <div class="casillero" 
-           [attr.data-index]="$index"
-           [class.vacio]="!item" 
-           [class.resaltado]="imagenSeleccionada() && !item"
-           [class.drag-sobre]="casilleroHover() === $index"
-           (dragover)="onDragOver($event, $index)"
-           (dragleave)="onDragLeave()"
-           (drop)="onDropEnCasillero($event, $index)"
-           (click)="asignarACasillero($index)">
-        @if (item) {
-          <div class="item-imagen"
-               draggable="true"
-               [class.arrastrando]="imagenArrastrada()?.img?.id === item.id"
-               (dragstart)="onDragStart($event, item, $index)"
-               (dragend)="onDragEnd()"
-               (touchstart)="onTouchStart($event, item, $index)"
-               (touchmove)="onTouchMove($event)"
-               (touchend)="onTouchEnd($event)">
-            <div class="img-wrapper">
-              <img [src]="item.url" [alt]="item.titulo">
-            </div>
-            <span class="titulo-imagen">{{item.titulo}}</span>
-          </div>
-        } @else {
-          <span class="numero">{{ $index + 1 }}</span>
-        }
-      </div>
-    }
-  </div>
-
-    <!-- Alertas de error o advertencia durante el juego -->
-  @if (mensaje().texto && mensaje().tipo === 'error') {
-    <div class="mensaje-alerta error">
-      {{ mensaje().texto }}
-    </div>
-  }
-
-  <!-- Botón de acción durante el juego -->
-  @if (!actividadTerminada()) {
-    <div class="controles-acciones">
-      <button class="btn-terminar" (click)="terminar()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-          <path d="M20 6L9 17l-5-5"/>
+    <!-- Encabezado Unificado -->
+    <header class="encabezado-actividad">
+      <button type="button" class="btn-volver" (click)="irAInicio()" title="Volver al inicio">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
-        TERMINAR
       </button>
+
+      <div class="info-encabezado">
+        <h1>LENGUA Y LITERATURA</h1>
+        <span class="subtitulo">Don Quijote de la Mancha</span>
+      </div>
+
+      <!-- Botón de Audio accesible -->
+      <button 
+        type="button" 
+        class="btn-audio-toggle" 
+        [class.silenciado]="!audioHabilitado()" 
+        (click)="toggleAudio()"
+        [title]="audioHabilitado() ? 'Voz activada' : 'Voz silenciada'">
+        @if (audioHabilitado()) {
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+          </svg>
+        }
+      </button>
+    </header>
+
+    <!-- Barra de Consigna -->
+    <div class="barra-consigna">
+      <span class="badge-tipo">ORDENAR LA HISTORIA</span>
+      <p class="texto-consigna">Arrastrá o tocá las imágenes para colocarlas en el orden correcto</p>
     </div>
-  }
 
-  <!-- Pantalla de Éxito con Botones de Guardar y Reintentar -->
-  <app-actividad-exito
-    [visible]="mostrarExito()"
-    [aciertos]="4"
-    [total]="4"
-    [guardando]="guardando()"
-    [guardadoExitoso]="guardadoExitoso()"
-    rutaActividad="/actividad/ordenar"
-    (guardar)="guardarResultado()"
-    (reiniciar)="reintentar()"
-    (continuar)="irAInicio()">
-  </app-actividad-exito>
+    <div class="cuerpo-actividad">
 
+      <!-- Zona de Imágenes Disponibles -->
+      <div class="seccion-zona">
+        <span class="etiqueta-seccion">Imágenes disponibles</span>
+        <div class="grilla-imagenes"
+             (dragover)="onDragOver($event)"
+             (drop)="onDropEnDisponibles($event)">
+          @for (img of disponibles(); track img.id) {
+            <div class="item-imagen" 
+                 draggable="true"
+                 [class.seleccionada]="imagenSeleccionada()?.id === img.id"
+                 [class.arrastrando]="imagenArrastrada()?.img?.id === img.id"
+                 (dragstart)="onDragStart($event, img)"
+                 (dragend)="onDragEnd()"
+                 (touchstart)="onTouchStart($event, img)"
+                 (touchmove)="onTouchMove($event)"
+                 (touchend)="onTouchEnd($event)"
+                 (click)="seleccionarImagen(img)">
+              <div class="img-wrapper">
+                <img [src]="img.url" [alt]="img.titulo">
+              </div>
+              <span class="titulo-imagen">{{ img.titulo }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Zona de Casilleros 1, 2, 3, 4 -->
+      <div class="seccion-zona">
+        <span class="etiqueta-seccion">Orden de la historia</span>
+        <div class="grilla-casilleros">
+          @for (item of casilleros(); track $index) {
+            <div class="casillero" 
+                 [attr.data-index]="$index"
+                 [class.vacio]="!item" 
+                 [class.resaltado]="imagenSeleccionada() && !item"
+                 [class.drag-sobre]="casilleroHover() === $index"
+                 (dragover)="onDragOver($event, $index)"
+                 (dragleave)="onDragLeave()"
+                 (drop)="onDropEnCasillero($event, $index)"
+                 (click)="asignarACasillero($index)">
+              @if (item) {
+                <div class="item-imagen"
+                     draggable="true"
+                     [class.arrastrando]="imagenArrastrada()?.img?.id === item.id"
+                     (dragstart)="onDragStart($event, item, $index)"
+                     (dragend)="onDragEnd()"
+                     (touchstart)="onTouchStart($event, item, $index)"
+                     (touchmove)="onTouchMove($event)"
+                     (touchend)="onTouchEnd($event)">
+                  <div class="img-wrapper">
+                    <img [src]="item.url" [alt]="item.titulo">
+                  </div>
+                  <span class="titulo-imagen">{{ item.titulo }}</span>
+                </div>
+              } @else {
+                <span class="numero-casillero">{{ $index + 1 }}</span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Mensaje de Alerta -->
+      @if (mensaje().texto) {
+        <div class="mensaje-alerta" [class.error]="mensaje().tipo === 'error'" [class.info]="mensaje().tipo === 'info'">
+          {{ mensaje().texto }}
+        </div>
+      }
+
+      <!-- Botón Terminar -->
+      @if (!actividadTerminada()) {
+        <div class="controles-acciones">
+          <button class="btn-terminar" (click)="terminar()" [disabled]="guardando()">
+            @if (guardando()) {
+              <span class="spinner"></span> CORRIGIENDO...
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+              TERMINAR
+            }
+          </button>
+        </div>
+      }
+
+    </div>
+
+    <!-- Pantalla de Éxito / Desempeño -->
+    <app-actividad-exito
+      [visible]="mostrarExito()"
+      [titulo]="tituloModal()"
+      [mensaje]="mensajeModal()"
+      [aciertos]="aciertosObtenidos()"
+      [total]="totalItems()"
+      [guardando]="guardando()"
+      [guardadoExitoso]="guardadoExitoso()"
+      rutaActividad="/actividad/ordenar"
+      (reiniciar)="reintentar()"
+      (continuar)="irAInicio()">
+    </app-actividad-exito>
+
+  </div>
 </div>

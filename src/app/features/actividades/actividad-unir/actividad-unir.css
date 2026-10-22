@@ -1,167 +1,163 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap');
-
 :host {
   display: block;
-  width: 100%;
-  min-height: 100%;
-  box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
-}
-
-/* ============================================================
-   CONTENEDOR RESPONSIVE
-   ============================================================ */
-.ordenar-contenedor {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: clamp(10px, 2vh, 18px);
-  width: 100%;
-  max-width: 880px;
   min-height: 100vh;
-  margin: 0 auto;
-  padding: clamp(12px, 2vh, 24px) clamp(14px, 3vw, 32px);
+  background-color: #f1f5f9; /* Fondo uniforme con el resto del proyecto */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   box-sizing: border-box;
-  background-color: #ffffff;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
-/* ============================================================
-   CABECERAS
-   ============================================================ */
-.contenedor-cabeceras {
+.contenedor-pagina {
+  width: 100%;
+  min-height: 100vh;
+  padding: 16px 12px 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .contenedor-pagina {
+    padding: 24px 20px 60px;
+  }
+}
+
+/* Tarjeta contenedora idéntica a actividades-materia */
+.tarjeta-actividad-wrapper {
+  width: 100%;
+  max-width: 760px;
+  background-color: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 620px;
-  gap: 8px;
 }
 
-.header-card {
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: 18px;
-  background-color: #edf4fe;
-}
-
-.materia-card {
+/* ENCABEZADO */
+.encabezado-actividad {
   display: flex;
   align-items: center;
-  gap: clamp(12px, 2vw, 18px);
-  padding: clamp(8px, 1.4vh, 12px) clamp(14px, 2.5vw, 22px);
+  gap: 16px;
+  padding: 18px 24px;
+  background-color: #2563eb; /* Azul coherente de la app */
+  color: #ffffff;
 }
 
-.icono-fondo.cyan {
+.btn-volver {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #18b4e7;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
-.texto-header h2 {
-  font-size: clamp(1rem, 1.5vw, 1.25rem);
-  font-weight: 900;
-  color: #152348;
+.btn-volver:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateX(-2px);
+}
+
+.info-encabezado {
+  flex: 1;
+}
+
+.info-encabezado h1 {
+  font-size: 1.15rem;
+  font-weight: 800;
   margin: 0;
-  letter-spacing: 0.2px;
+  color: #ffffff;
+  letter-spacing: -0.2px;
 }
 
-.texto-header p {
-  font-size: clamp(0.85rem, 1.2vw, 1rem);
-  color: #475569;
-  margin: 2px 0 0 0;
-  font-weight: 500;
+.info-encabezado .subtitulo {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  display: block;
+  margin-top: 2px;
 }
 
 .btn-audio-toggle {
-  margin-left: auto;
-  background-color: #ffffff;
-  border: 2px solid #18b4e7;
-  color: #18b4e7;
-  width: clamp(38px, 5vw, 44px);
-  height: clamp(38px, 5vw, 44px);
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(24, 180, 231, 0.25);
   flex-shrink: 0;
 }
 
 .btn-audio-toggle:hover {
-  background-color: #18b4e7;
-  color: #ffffff;
-  transform: scale(1.08);
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.05);
 }
 
 .btn-audio-toggle.silenciado {
-  border-color: #94a3b8;
-  color: #94a3b8;
-  box-shadow: none;
+  opacity: 0.6;
 }
 
-.actividad-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: clamp(10px, 1.6vh, 16px) clamp(14px, 2.5vw, 22px);
-}
-
-.actividad-info {
+/* BARRA DE CONSIGNA */
+.barra-consigna {
+  padding: 14px 24px;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
-  gap: clamp(12px, 2vw, 18px);
-  width: 100%;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.icono-fondo.purple {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: clamp(42px, 5.5vw, 50px);
-  height: clamp(42px, 5.5vw, 50px);
-  border-radius: 50%;
-  background-color: #b2b5fc;
-  color: #1e295a;
-  flex-shrink: 0;
-}
-
-.separador {
-  width: 100%;
-  height: 2px;
-  background-color: #94a3b8;
-  margin: 10px 0 8px 0;
-  opacity: 0.65;
-}
-
-.consigna {
-  font-size: clamp(0.88rem, 1.3vw, 1.05rem);
-  font-weight: 900;
-  color: #0b132b;
-  text-align: center;
-  margin: 0;
+.badge-tipo {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #2563eb;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 3px 10px;
+  border-radius: 8px;
   letter-spacing: 0.5px;
 }
 
-/* ============================================================
-   TABLERO CENTRAL
-   ============================================================ */
+.texto-consigna {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* TABLERO */
+.cuerpo-actividad {
+  padding: 24px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .tablero-unir {
   position: relative;
   display: flex;
   justify-content: space-between;
   align-items: stretch;
-  gap: clamp(36px, 10vw, 110px);
+  gap: clamp(32px, 8vw, 80px);
   width: 100%;
-  max-width: 780px;
-  margin: clamp(8px, 1.8vh, 20px) 0;
+  max-width: 680px;
+  margin-bottom: 24px;
   box-sizing: border-box;
-  --card-dim: clamp(85px, 14vw, 130px);
+
+  /* Tamaño de tarjetas dinámico para Tablet y Desktop */
+  --card-size: clamp(80px, 12vw, 110px);
 }
 
 .svg-flechas {
@@ -171,41 +167,30 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  overflow: visible;
   z-index: 5;
 }
 
 .linea-flecha {
-  stroke-width: clamp(4px, 0.6vw, 6px);
+  stroke-width: clamp(4px, 0.5vw, 6px);
   fill: none;
   cursor: pointer;
   pointer-events: stroke;
-  transition: stroke 0.25s ease, stroke-width 0.25s ease;
+  transition: stroke 0.2s ease;
 }
 
-.linea-flecha:hover {
-  stroke-width: 7px;
-}
-
-/* ============================================================
-   COLUMNAS
-   ============================================================ */
 .columna-items {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: clamp(12px, 2.2vh, 20px);
+  gap: 16px;
   z-index: 10;
 }
 
 .columna-izq {
-  flex: 0 0 var(--card-dim);
-  width: var(--card-dim);
+  flex: 0 0 var(--card-size);
 }
 
 .columna-der {
   flex: 1;
-  max-width: 440px;
 }
 
 /* Tarjeta Base */
@@ -213,174 +198,141 @@
   position: relative;
   display: flex;
   align-items: center;
-  background-color: #eef4fe;
-  border: clamp(2px, 0.35vw, 3px) solid #1e3b70;
-  border-radius: clamp(14px, 2vw, 20px);
+  background-color: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 16px;
   cursor: pointer;
   user-select: none;
   box-sizing: border-box;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .item-tarjeta:hover {
+  border-color: #94a3b8;
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(30, 59, 112, 0.22);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
 .item-tarjeta.seleccionada {
   border-color: #2563eb;
-  background-color: #e0ecff;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.38);
-  transform: scale(1.025);
+  background-color: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
 }
 
-.item-tarjeta.conectada {
-  border-color: #475569;
-}
-
-/* Estados de Corrección Sin Rojo */
 .item-tarjeta.conexion-correcta {
   border-color: #10b981 !important;
   background-color: #ecfdf5 !important;
 }
 
-/* Ámbar suave motivador en lugar de rojo punitivo */
 .item-tarjeta.conexion-revisar {
   border-color: #f59e0b !important;
   background-color: #fefce8 !important;
 }
 
-/* Columna Izquierda (Imagen) */
-.tarjeta-solo-imagen {
-  width: var(--card-dim);
-  height: var(--card-dim);
-  aspect-ratio: 1 / 1;
-  padding: 0;
+/* Columna Izquierda: Imagen */
+.tarjeta-imagen {
+  width: var(--card-size);
+  height: var(--card-size);
   overflow: hidden;
-  background-color: #ffffff;
-  flex-shrink: 0;
+  padding: 0;
 }
 
 .img-container {
   width: 100%;
   height: 100%;
-  display: flex;
 }
 
 .img-container img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
   display: block;
-  pointer-events: none;
 }
 
-/* Columna Derecha (Texto Breve) */
+/* Columna Derecha: Texto */
 .tarjeta-texto {
-  min-height: var(--card-dim);
-  height: var(--card-dim);
-  padding: clamp(8px, 1.5vh, 14px) clamp(14px, 2.5vw, 26px);
+  min-height: var(--card-size);
+  height: var(--card-size);
+  padding: 8px 16px;
   justify-content: center;
-  align-items: center;
   text-align: center;
-  flex-shrink: 0;
 }
 
 .texto-accion {
-  font-size: clamp(0.92rem, 1.7vw, 1.25rem);
-  font-weight: 800;
-  line-height: 1.3;
-  color: #10214c;
+  font-size: clamp(0.9rem, 1.4vw, 1.1rem);
+  font-weight: 700;
+  color: #1e293b;
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  line-height: 1.25;
 }
 
-/* Conectores */
+/* Puntos conectores */
 .conector-punto {
   position: absolute;
-  width: clamp(14px, 1.8vw, 18px);
-  height: clamp(14px, 1.8vw, 18px);
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background-color: #ffffff;
-  border: clamp(2.5px, 0.4vw, 3.5px) solid #1e3b70;
+  border: 3px solid #2563eb;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 15;
-  transition: transform 0.2s ease;
-}
-
-.item-tarjeta:hover .conector-punto {
-  transform: translateY(-50%) scale(1.25);
+  z-index: 20;
 }
 
 .conector-der {
-  right: calc(clamp(14px, 1.8vw, 18px) / -2);
+  right: -8px;
 }
 
 .conector-izq {
-  left: calc(clamp(14px, 1.8vw, 18px) / -2);
+  left: -8px;
 }
 
-/* ============================================================
-   ALERTA AMIGABLE (TONO AMARILLO CÁLIDO PASTEL)
-   ============================================================ */
+/* Alertas */
 .mensaje-alerta-amigable {
-  width: 100%;
-  max-width: 540px;
-  padding: clamp(10px, 1.5vh, 14px) 18px;
-  font-size: clamp(0.92rem, 1.3vw, 1.05rem);
-  font-weight: 800;
-  text-align: center;
-  border-radius: 14px;
-  box-sizing: border-box;
   background-color: #fefce8;
+  border: 1px solid #fde047;
   color: #854d0e;
-  border: 1.5px solid #fde047;
-  margin-bottom: 6px;
-  animation: fadeIn 0.2s ease;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 10px 18px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+  max-width: 500px;
 }
 
-/* ============================================================
-   BOTÓN TERMINAR
-   ============================================================ */
+/* Botón Terminar */
 .controles-acciones {
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  width: 100%;
-  margin-top: clamp(6px, 1.5vh, 14px);
 }
 
 .btn-terminar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  width: 100%;
-  max-width: clamp(210px, 28vw, 270px);
-  padding: clamp(12px, 1.8vh, 16px) clamp(22px, 3vw, 32px);
-  font-size: clamp(1rem, 1.5vw, 1.25rem);
-  font-weight: 800;
-  letter-spacing: 0.6px;
-  border-radius: 16px;
-  background-color: #2d74db;
+  gap: 10px;
+  background-color: #2563eb;
   color: #ffffff;
   border: none;
-  box-shadow: 0 5px 16px rgba(45, 116, 219, 0.35);
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 14px 36px;
+  border-radius: 16px;
   cursor: pointer;
-  transition: transform 0.15s ease, background-color 0.15s ease;
+  letter-spacing: 0.5px;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
 }
 
-.btn-terminar:hover {
-  background-color: #2361bc;
+.btn-terminar:hover:not(:disabled) {
+  background-color: #1d4ed8;
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+.btn-terminar:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }

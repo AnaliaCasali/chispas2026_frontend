@@ -1,151 +1,152 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap');
-
 :host {
   display: block;
-  width: 100%;
-  height: 100%;
+  min-height: 100vh;
+  background-color: #f1f5f9;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
 }
 
-/* ============================================================
-   CONTENEDOR PRINCIPAL - ACTIVIDAD ORDENAR
-   ============================================================ */
-.ordenar-contenedor {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; /* Evita que los elementos se dispersen por la pantalla */
-  gap: clamp(8px, 1.3vh, 14px);
+.contenedor-pagina {
   width: 100%;
-  max-width: 1300px;
-  max-height: 760px;
-  height: 100%;
-  margin: 0 auto;
-  padding: clamp(8px, 1.4vh, 16px) clamp(10px, 1.5vw, 20px);
+  min-height: 100vh;
+  padding: 16px 12px 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   box-sizing: border-box;
-  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .contenedor-pagina {
+    padding: 24px 20px 60px;
+  }
+}
+
+.tarjeta-actividad-wrapper {
+  width: 100%;
+  max-width: 820px;
   background-color: #ffffff;
-  font-family: 'Roboto', sans-serif;
-
-  /* Dimensiones verticales alargadas idénticas a Figma */
-  --card-w: clamp(75px, 9.2vw, 140px);
-  --card-h: clamp(125px, 23vh, 215px);
-  --gap-cards: clamp(6px, 1.2vw, 18px);
-  --radius-card: 14px;
-}
-
-/* ============================================================
-   AGRUPADOR DE CABECERAS (Mantiene materia y actividad juntas)
-   ============================================================ */
-.contenedor-cabeceras {
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 520px;
-  gap: 4px; /* Distancia mínima entre ambos tabs */
 }
 
-.header-card {
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: 16px;
-  background-color: #edf4fe;
-}
-
-/* Cabecera Materia */
-.materia-card {
+/* ENCABEZADO */
+.encabezado-actividad {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 8px 18px;
+  gap: 16px;
+  padding: 18px 24px;
+  background-color: #2563eb;
+  color: #ffffff;
 }
 
-.icono-fondo.cyan {
+.btn-volver {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #18b4e7;
-}
-
-.texto-header h2 {
-  font-size: clamp(0.95rem, 1.1vw, 1.15rem);
-  font-weight: 800;
-  color: #152348;
-  margin: 0;
-  letter-spacing: 0.2px;
-}
-
-.texto-header p {
-  font-size: clamp(0.8rem, 0.95vw, 0.9rem);
-  color: #475569;
-  margin: 1px 0 0 0;
-  font-weight: 500;
-}
-
-/* Cabecera Actividad */
-.actividad-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 12px 18px 10px 18px;
-}
-
-.actividad-info {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  justify-content: flex-start;
-}
-
-.icono-fondo.purple {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background-color: #b2b5fc;
-  color: #1e295a;
+  cursor: pointer;
+  transition: all 0.15s ease;
   flex-shrink: 0;
 }
 
-/* Línea divisoria horizontal */
-.separador {
-  width: 100%;
-  height: 1.5px;
-  background-color: #94a3b8;
-  margin: 8px 0 6px 0;
-  opacity: 0.7;
+.btn-volver:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateX(-2px);
 }
 
-.consigna {
-  font-size: clamp(0.78rem, 0.95vw, 0.92rem);
+.info-encabezado h1 {
+  font-size: 1.15rem;
   font-weight: 800;
-  color: #0b132b;
-  text-align: center;
   margin: 0;
-  letter-spacing: 0.4px;
+  color: #ffffff;
 }
 
-/* ============================================================
-   ZONA 1: GRILLA DE IMÁGENES DISPONIBLES
-   ============================================================ */
-.grilla-imagenes {
+.info-encabezado .subtitulo {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+  display: block;
+  margin-top: 2px;
+}
+
+/* BARRA DE CONSIGNA */
+.barra-consigna {
+  padding: 14px 24px;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.badge-tipo {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #2563eb;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 3px 10px;
+  border-radius: 8px;
+}
+
+.texto-consigna {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* CUERPO */
+.cuerpo-actividad {
+  padding: 24px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  align-items: center;
+
+  /* Tamaño de tarjetas escalable para Desktop y Tablet */
+  --card-w: clamp(80px, 16vw, 150px);
+  --card-h: clamp(120px, 22vw, 190px);
+  --gap-cards: clamp(8px, 1.8vw, 18px);
+}
+
+.seccion-zona {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.etiqueta-seccion {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* GRILLAS */
+.grilla-imagenes, .grilla-casilleros {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: var(--gap-cards);
   width: 100%;
-  padding: 2px 0;
-  box-sizing: border-box;
+  min-height: calc(var(--card-h) + 8px);
 }
 
-/* ============================================================
-   TARJETA DE IMAGEN (.item-imagen)
-   ============================================================ */
+/* TARJETA DE IMAGEN */
 .item-imagen {
   display: flex;
   flex-direction: column;
@@ -153,36 +154,33 @@
   justify-content: space-between;
   width: var(--card-w);
   height: var(--card-h);
-  background-color: #eef4fe;
-  border: 2px solid #1e3b70;
-  border-radius: var(--radius-card);
+  background-color: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 16px;
   padding: 6px;
   box-sizing: border-box;
   cursor: grab;
   user-select: none;
-  touch-action: none; /* Clave para arrastre táctil fluido en móvil/tablet */
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  touch-action: none;
+  transition: all 0.15s ease;
   overflow: hidden;
 }
 
 .item-imagen:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(30, 59, 112, 0.18);
-}
-
-.item-imagen:active {
-  cursor: grabbing;
+  border-color: #94a3b8;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
 }
 
 .item-imagen.seleccionada {
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
+  background-color: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
   transform: scale(1.03);
 }
 
 .item-imagen.arrastrando {
-  opacity: 0.35;
-  transform: scale(0.95);
+  opacity: 0.4;
 }
 
 .img-wrapper {
@@ -190,246 +188,129 @@
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
   border-radius: 10px;
+  overflow: hidden;
 }
 
 .img-wrapper img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  pointer-events: none;
-  border-radius: 10px;
+  display: block;
 }
 
 .titulo-imagen {
-  flex: 0 0 auto;
-  width: 100%;
-  font-size: clamp(0.72rem, 0.95vw, 0.95rem);
-  font-weight: 800;
-  color: #10214c;
+  font-size: clamp(0.72rem, 1vw, 0.88rem);
+  font-weight: 700;
+  color: #1e293b;
   text-align: center;
-  line-height: 1.15;
   margin-top: 4px;
-  padding: 0 2px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  line-height: 1.2;
 }
 
-/* ============================================================
-   ZONA 2: CASILLEROS DESTINO (1, 2, 3, 4)
-   ============================================================ */
-.grilla-casilleros {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: var(--gap-cards);
-  width: 100%;
-  padding: 2px 0;
-  box-sizing: border-box;
-}
-
+/* CASILLEROS */
 .casillero {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: var(--card-w);
   height: var(--card-h);
-  border-radius: var(--radius-card);
+  border-radius: 16px;
   box-sizing: border-box;
   transition: all 0.2s ease;
 }
 
 .casillero.vacio {
-  border: 2px dashed #1e3b70;
-  background-color: #eef4fe;
+  border: 2px dashed #94a3b8;
+  background-color: #f8fafc;
   cursor: pointer;
 }
 
 .casillero.vacio:hover {
-  background-color: #e5effe;
+  background-color: #f1f5f9;
+  border-color: #64748b;
 }
 
-.casillero .numero {
-  font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+.numero-casillero {
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
   font-weight: 900;
-  color: #10214c;
-  user-select: none;
-}
-
-.casillero.resaltado {
-  border-color: #2563eb;
-  background-color: #e0ecff;
-  box-shadow: 0 0 10px rgba(37, 99, 235, 0.25);
+  color: #94a3b8;
 }
 
 .casillero.drag-sobre {
   border-color: #10b981 !important;
-  background-color: #e6f9f0 !important;
+  background-color: #ecfdf5 !important;
   transform: scale(1.03);
 }
 
 .casillero .item-imagen {
   width: 100%;
   height: 100%;
-  margin: 0;
 }
 
-/* ============================================================
-   ALERTAS
-   ============================================================ */
+/* ALERTAS Y BOTÓN */
 .mensaje-alerta {
-  flex: 0 0 auto;
-  width: 100%;
-  max-width: 520px;
-  padding: 8px 14px;
-  font-size: clamp(0.85rem, 1vw, 0.95rem);
-  font-weight: 700;
-  text-align: center;
-  border-radius: 10px;
-  box-sizing: border-box;
-}
-
-.mensaje-alerta.exito {
-  background-color: #ecfdf5;
-  color: #065f46;
-  border: 1.5px solid #6ee7b7;
-}
-
-.mensaje-alerta.error {
   background-color: #fff1f2;
+  border: 1px solid #fecdd3;
   color: #9f1239;
-  border: 1.5px solid #fecdd3;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 10px 18px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 500px;
 }
 
-/* ============================================================
-   CONTROLES Y BOTONES DE ACCIÓN (FIGMA STYLE)
-   ============================================================ */
 .controles-acciones {
-  flex: 0 0 auto;
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  width: 100%;
-  margin-top: 2px;
 }
 
-.botones-finalizado {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 14px; /* Separación clara entre Guardar y Reintentar */
-  width: 100%;
-  max-width: 480px;
-}
-
-.btn-terminar, .btn-reintentar, .btn-guardar {
-  flex: 0 0 auto;
+.btn-terminar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  width: 100%;
-  max-width: 210px;
-  padding: clamp(9px, 1.3vh, 12px) 20px;
-  font-size: clamp(0.85rem, 1vw, 1rem);
+  gap: 10px;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  font-size: 1rem;
   font-weight: 800;
-  letter-spacing: 0.5px;
-  border-radius: 12px;
+  padding: 14px 36px;
+  border-radius: 16px;
   cursor: pointer;
-  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  letter-spacing: 0.5px;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
 }
 
-/* Botón Terminar (Azul Figma) */
-.btn-terminar {
-  background-color: #2d74db;
+.btn-terminar:hover:not(:disabled) {
+  background-color: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-audio-toggle {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: #ffffff;
-  border: none;
-  box-shadow: 0 4px 12px rgba(45, 116, 219, 0.28);
-  max-width: 200px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
-.btn-terminar:hover {
-  background-color: #2361bc;
-  transform: translateY(-1px);
+.btn-audio-toggle:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.05);
 }
 
-/* Botón Guardar Resultado (Verde Éxito) */
-.btn-guardar.btn-exito {
-  background-color: #10b981;
-  color: #ffffff;
-  border: none;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28);
-}
-
-.btn-guardar.btn-exito:hover:not(:disabled) {
-  background-color: #059669;
-  transform: translateY(-1px);
-}
-
-.btn-guardar:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-/* Botón Volver a intentar (Secundario / Contorno Figma) */
-.btn-reintentar.btn-secundario {
-  background-color: #eef4fe;
-  color: #10214c;
-  border: 2px solid #1e3b70;
-  box-shadow: 0 2px 8px rgba(30, 59, 112, 0.12);
-}
-
-.btn-reintentar.btn-secundario:hover {
-  background-color: #e0ecff;
-  transform: translateY(-1px);
-}
-
-/* ============================================================
-   RESPONSIVE: VISTA MÓVIL Y TABLET
-   ============================================================ */
-@media screen and (max-width: 600px) {
-  .ordenar-contenedor {
-    padding: 10px 8px;
-    --card-w: calc((100% - 24px) / 4);
-    --card-h: clamp(120px, 35vw, 160px);
-    --gap-cards: 6px;
-    max-height: none;
-    height: auto;
-    min-height: 100vh;
-    overflow-y: auto;
-    justify-content: flex-start;
-  }
-
-  .contenedor-cabeceras {
-    gap: 4px;
-  }
-
-  .header-card {
-    border-radius: 12px;
-    padding: 8px 12px;
-  }
-
-  .btn-terminar {
-    max-width: 180px;
-    padding: 10px 18px;
-    margin-top: 8px;
-  }
-
-  .botones-finalizado {
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    max-width: 240px;
-  }
-
-  .btn-guardar, .btn-reintentar {
-    max-width: 100%;
-  }
+.btn-audio-toggle.silenciado {
+  opacity: 0.6;
 }
