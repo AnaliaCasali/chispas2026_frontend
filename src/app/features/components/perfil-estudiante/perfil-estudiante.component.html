@@ -1,21 +1,90 @@
-<main class="perfil">
-  <button type="button" (click)="volver()">← Volver</button>
+<div class="contenedor-perfil">
 
-  @if (cargando()) {
-    <p>Cargando perfil...</p>
-  } @else if (error()) {
-    <p class="error-text">{{ error() }}</p>
-  } @else if (perfil(); as p) {
-    <h1>{{ p.nombre }} {{ p.apellido }}</h1>
-    <p><strong>Año que cursa:</strong> {{ p.curso ?? 'Sin curso asignado' }}</p>
+  <!-- ENCABEZADO -->
+  <header class="encabezado-perfil">
+    <button type="button" class="btn-volver" (click)="volver()" aria-label="Volver al inicio">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <div class="info-encabezado">
+      <h1>Mi perfil</h1>
+      <span class="subtitulo">Tus datos en la escuela</span>
+    </div>
+  </header>
 
-    <h2>Condición médica</h2>
-    @if (p.condiciones.length) {
-      <ul>
-        @for (c of p.condiciones; track c) { <li>{{ c }}</li> }
-      </ul>
-    } @else {
-      <p>{{ p.mensaje ?? 'Sin condición registrada' }}</p>
+  <div class="cuerpo-perfil">
+
+    @if (cargando()) {
+      <div class="estado-mensaje"><p>Cargando tu perfil...</p></div>
+
+    } @else if (error()) {
+      <div class="estado-error">
+        <p class="texto-error">{{ error() }}</p>
+        <button type="button" class="btn-reintentar" (click)="cargar()">Reintentar</button>
+      </div>
+
+    } @else if (perfil(); as p) {
+
+      <!-- IDENTIDAD -->
+      <section class="tarjeta-identidad">
+        @if (p.fotoUrl) {
+          <img class="avatar" [src]="p.fotoUrl" alt="Foto de perfil" />
+        } @else {
+          <div class="avatar avatar-iniciales" aria-hidden="true">{{ iniciales() }}</div>
+        }
+        <div class="datos-identidad">
+          <h2 class="nombre-estudiante">{{ p.nombre }} {{ p.apellido }}</h2>
+          <span class="badge-curso">{{ p.curso ?? 'Sin curso asignado' }}</span>
+        </div>
+      </section>
+
+      <!-- CONDICIÓN MÉDICA -->
+      <section class="seccion">
+        <h2>Condición médica</h2>
+        @if (p.condiciones.length) {
+          <ul class="lista-chips">
+            @for (c of p.condiciones; track c) {
+              <li class="chip-condicion">{{ c }}</li>
+            }
+          </ul>
+        } @else {
+          <p class="texto-vacio">{{ p.mensaje ?? 'Sin condición registrada' }}</p>
+        }
+      </section>
+
+      <!-- OBSERVACIONES -->
+      <section class="seccion">
+        <h2>Observaciones</h2>
+        @if (p.observaciones) {
+          <p class="texto-observaciones">{{ p.observaciones }}</p>
+        } @else {
+          <p class="texto-vacio">Sin observaciones</p>
+        }
+      </section>
+
+      <!-- CAPACIDADES -->
+      <section class="seccion">
+        <h2>Capacidades</h2>
+        @for (g of capacidadesPorArea(); track g.area) {
+          <div class="grupo-area">
+            <h3>{{ g.area }}</h3>
+            <ul class="lista-capacidades">
+              @for (c of g.items; track c.pregunta) {
+                <li class="fila-capacidad">
+                  <span>{{ c.pregunta }}</span>
+                  <span class="badge-respuesta" [class.si]="c.respuesta" [class.no]="!c.respuesta">
+                    {{ c.respuesta ? 'Sí' : 'No' }}
+                  </span>
+                </li>
+              }
+            </ul>
+          </div>
+        } @empty {
+          <p class="texto-vacio">Sin capacidades registradas</p>
+        }
+      </section>
     }
-  }
-</main>
+  </div>
+</div>
