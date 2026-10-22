@@ -1,4 +1,5 @@
-<app-navegacion></app-navegacion>
-<main class="contenido-principal">
+<app-navegacion #nav></app-navegacion>
+
+<main [class.con-sidebar]="nav.mostrarMenu()">
   <router-outlet></router-outlet>
 </main>

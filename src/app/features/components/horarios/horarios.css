@@ -1,0 +1,252 @@
+:host {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  padding: 20px 16px 90px;
+  box-sizing: border-box;
+}
+
+.contenedor-horarios {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+/* =========================================
+   ENCABEZADO
+   ========================================= */
+.encabezado-horarios {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px;
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  border-bottom: 1px solid #bfdbfe;
+}
+
+.icono-calendario-header {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #0099ff 0%, #0077e6 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 119, 230, 0.3);
+}
+
+.texto-header h1 {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #1e3a8a;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.texto-header p {
+  font-size: 0.85rem;
+  color: #3b82f6;
+  margin: 4px 0 0;
+  font-weight: 600;
+}
+
+/* =========================================
+   CUERPO Y SEPARADOR HOY
+   ========================================= */
+.cuerpo-horarios {
+  padding: 24px 20px 32px;
+}
+
+.divisor-hoy {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.label-hoy {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.linea-divisor {
+  flex: 1;
+  height: 2px;
+  background-color: #cbd5e1;
+  border-radius: 2px;
+}
+
+/* =========================================
+   TARJETAS DE CLASE (Estilo Mockup)
+   ========================================= */
+.lista-clases {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tarjeta-clase {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 20px;
+  background-color: #eff6ff; /* Celeste tenue de fondo como en el diseño */
+  border: 1.5px solid #bfdbfe;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Borde inferior grueso con el color característico de la materia */
+.tarjeta-clase::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: var(--color-materia, #2563eb);
+}
+
+.tarjeta-clase:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  border-color: var(--color-materia, #2563eb);
+}
+
+/* Indicador de clase en curso */
+.tarjeta-clase.en-curso {
+  border-color: #2563eb;
+  background-color: #f0f7ff;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
+}
+
+/* Círculo con el ícono */
+.circulo-icono {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  transition: transform 0.2s ease;
+}
+
+.tarjeta-clase:hover .circulo-icono {
+  transform: scale(1.06);
+}
+
+/* Información */
+.info-clase {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.fila-titulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nombre-clase {
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.badge-ahora {
+  background-color: #22c55e;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  animation: pulso 2s infinite;
+}
+
+@keyframes pulso {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.rango-horario {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.rango-horario svg {
+  color: #64748b;
+}
+
+/* =========================================
+   ESTADOS DE CARGA, VACÍO Y ERROR
+   ========================================= */
+.estado-mensaje,
+.estado-error,
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 16px;
+  gap: 12px;
+  color: #64748b;
+}
+
+.icono-descanso {
+  font-size: 2.5rem;
+}
+
+.titulo-vacio {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.subtexto-vacio {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.btn-reintentar {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-reintentar:hover {
+  background-color: #1d4ed8;
+}

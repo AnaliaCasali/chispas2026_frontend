@@ -9,9 +9,9 @@
   width: 100%;
 }
 
+/* Margen para escritorio solo cuando el menú está activo */
 @media (min-width: 769px) {
-  main,
-  router-outlet + * {
+  main.con-sidebar {
     margin-left: 250px;
   }
 }
