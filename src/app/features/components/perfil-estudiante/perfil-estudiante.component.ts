@@ -1,12 +1,10 @@
-import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
-import { AuthService } from '../../../core/services/auth.service';
-import { Role } from '../../../core/models/user';
 import { ApiError } from '../../../core/interceptors/error-interceptor';
 import { EstudianteService } from '../../services/estudiante.service';
-import { PerfilEstudiante } from '../../models/perfil-estudiante.model';
+import { CapacidadEstudiante, PerfilEstudiante } from '../../models/perfil-estudiante.model';
 
 @Component({
   selector: 'app-perfil-estudiante',
@@ -16,28 +14,45 @@ import { PerfilEstudiante } from '../../models/perfil-estudiante.model';
 })
 export class PerfilEstudianteComponent implements OnInit {
   private service = inject(EstudianteService);
-  private auth = inject(AuthService);
   private router = inject(Router);
 
-  readonly id = input<string>();            // llega por la ruta (withComponentInputBinding)
   perfil = signal<PerfilEstudiante | null>(null);
   cargando = signal(true);
   error = signal<string | null>(null);
-  esDocente = computed(() => this.auth.hasRole([Role.DOCENTE]));
+
+  // Iniciales para el avatar cuando no hay foto
+  iniciales = computed(() => {
+    const p = this.perfil();
+    return p ? `${p.nombre.charAt(0)}${p.apellido.charAt(0)}`.toUpperCase() : '';
+  });
+
+  // Agrupa la lista plana de capacidades por área
+  capacidadesPorArea = computed(() => {
+    const grupos = new Map<string, CapacidadEstudiante[]>();
+    for (const c of this.perfil()?.capacidades ?? []) {
+      grupos.set(c.area, [...(grupos.get(c.area) ?? []), c]);
+    }
+    return [...grupos].map(([area, items]) => ({ area, items }));
+  });
 
   ngOnInit(): void {
-    const id = this.id();
-    const peticion = id ? this.service.perfilDe(+id) : this.service.miPerfil();
-    peticion.pipe(finalize(() => this.cargando.set(false))).subscribe({
+    this.cargar();
+  }
+
+  cargar(): void {
+    this.cargando.set(true);
+    this.error.set(null);
+
+    this.service.miPerfil().pipe(finalize(() => this.cargando.set(false))).subscribe({
       next: (p) => this.perfil.set(p),
       error: (err: ApiError) =>
         this.error.set(err.status === 403 || err.status === 404
           ? err.message
-          : 'No se pudo cargar el perfil.'),
+          : 'No se pudo cargar tu perfil.'),
     });
   }
 
   volver(): void {
-    this.router.navigate([this.esDocente() ? '/estudiantes' : '/inicio']);
+    this.router.navigate(['/inicio']);
   }
 }
