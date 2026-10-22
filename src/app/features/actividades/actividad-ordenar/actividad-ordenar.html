@@ -3,7 +3,7 @@
 
     <!-- Encabezado Unificado -->
     <header class="encabezado-actividad">
-      <button type="button" class="btn-volver" (click)="irAInicio()" title="Volver al inicio">
+      <button type="button" class="btn-volver" (click)="volver()" title="Volver a la pantalla anterior">
         <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
@@ -140,7 +140,7 @@
       [guardadoExitoso]="guardadoExitoso()"
       rutaActividad="/actividad/ordenar"
       (reiniciar)="reintentar()"
-      (continuar)="irAInicio()">
+      (continuar)="volver()">
     </app-actividad-exito>
 
   </div>

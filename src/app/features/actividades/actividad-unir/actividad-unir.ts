@@ -9,7 +9,7 @@ import {
   signal,
   PLATFORM_ID
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import {
@@ -58,9 +58,14 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
   private authService = inject(AuthService);
   private actividadService = inject(ActividadService);
   private esBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private location = inject(Location);
 
   // Tarea 2 en la base de datos es la actividad de Unir con Flechas de Don Quijote
   tareaId = signal<number>(2);
+
+  materiaNombre = signal<string>('LENGUA Y LITERATURA');
+  temaContenido = signal<string>('Don Quijote de la Mancha');
+  consignaTexto = signal<string>('Uní cada imagen con la frase que corresponde');
 
   get esEstudiante(): boolean {
     return this.authService.isAuthenticated() && this.authService.getRol() === 'ESTUDIANTE';
@@ -118,8 +123,60 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     const idParam = this.route.snapshot.paramMap.get('tareaId') || this.route.snapshot.queryParamMap.get('tareaId');
     if (idParam) {
       this.tareaId.set(Number(idParam));
+      this.cargarDatosBackend(Number(idParam));
+    } else {
+      this.reintentar();
     }
-    this.reintentar();
+  }
+
+  cargarDatosBackend(tareaId: number): void {
+    this.actividadService.obtenerDetalle(tareaId).subscribe({
+      next: (detalle) => {
+        if (detalle.materia?.nombre) this.materiaNombre.set(detalle.materia.nombre.toUpperCase());
+        if (detalle.titulo) this.temaContenido.set(detalle.titulo);
+        if (detalle.consigna) this.consignaTexto.set(detalle.consigna);
+        // 1. Separamos los ítems de la columna izquierda (Imágenes)
+        this.imagenes = detalle.items
+          .filter(item => item.lado === 'IZQ')
+          .map(item => ({
+            id: item.itemId,
+            texto: item.titulo || item.textoAlt,
+            url: item.imagenUrl
+          }));
+
+        // 2. Separamos los ítems de la columna derecha (Frases / Textos)
+        this.acciones = detalle.items
+          .filter(item => item.lado === 'DER')
+          .map(item => ({
+            id: item.itemId,
+            texto: item.titulo || item.textoAlt
+          }));
+
+        // 3. Cantidad de parejas que el alumno debe unir
+        this.totalItems.set(this.imagenes.length);
+
+        // 4. Si la tarea ya estaba finalizada en el backend, bloqueamos la edición
+        if (detalle.realizada) {
+          this.actividadTerminada.set(true);
+          this.tituloModal.set('¡Actividad ya completada!');
+          this.mensajeModal.set('Ya respondiste correctamente esta actividad anteriormente.');
+          this.guardadoExitoso.set(true);
+          this.mostrarExito.set(true);
+        } else {
+          // Preparamos el tablero limpio para resolver
+          this.reintentar();
+        }
+
+        // 5. Esperamos un ciclo de renderizado para recalcular los puntos de conexión
+        if (this.esBrowser) {
+          setTimeout(() => this.recalcularFlechas(), 150);
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar detalle de la actividad unir:', err);
+        this.reintentar(); // Si falla, queda con el estado inicial de respaldo
+      }
+    });
   }
 
     ngAfterViewInit(): void {
@@ -362,7 +419,11 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     this.mensajeAlerta.set({ texto: '', tipo: null });
   }
 
-  irAInicio(): void {
-    this.router.navigate(['/inicio']);
+  volver(): void {
+    if (this.esBrowser && window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/mi-carpeta']);
+    }
   }
 }

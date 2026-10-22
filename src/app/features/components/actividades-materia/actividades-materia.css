@@ -255,3 +255,153 @@
 .btn-reintentar:hover {
   background-color: #1d4ed8;
 }
+
+/* Pestañas de Filtro */
+.barra-filtros {
+  display: flex;
+  background-color: #f8fafc;
+  padding: 8px 16px;
+  gap: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tab-filtro {
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab-filtro.activo {
+  background-color: #ffffff;
+  color: #2563eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Modal de Historial */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-contenido {
+  background: #ffffff;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.modal-header h3 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.badge-realizada-modal {
+  display: inline-block;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.resultado-destacado {
+  text-align: center;
+  padding: 24px 20px;
+}
+
+.resultado-destacado .puntuacion {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #16a34a;
+  display: block;
+  line-height: 1;
+}
+
+.resultado-destacado .etiqueta-puntuacion {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 4px;
+  display: block;
+}
+
+.mensaje-felicitacion {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+.seccion-intentos {
+  padding: 0 24px 20px;
+}
+
+.seccion-intentos h4 {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.lista-intentos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item-intento {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-cerrar-modal {
+  width: 100%;
+  padding: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-cerrar-modal:hover {
+  background: #1d4ed8;
+}
