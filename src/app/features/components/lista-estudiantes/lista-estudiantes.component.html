@@ -1,0 +1,21 @@
+<main class="lista">
+  <h1>Mis estudiantes</h1>
+
+  @if (cargando()) {
+    <p>Cargando estudiantes...</p>
+  } @else if (error()) {
+    <p class="error-text">{{ error() }}</p>
+  } @else if (estudiantes().length === 0) {
+    <p>No tenés estudiantes asignados.</p>
+  } @else {
+    <ul>
+      @for (e of estudiantes(); track e.id) {
+        <li>
+          <button type="button" (click)="verPerfil(e.id)">
+            {{ e.apellido }}, {{ e.nombre }} — {{ e.curso ?? 'Sin curso' }}
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</main>
