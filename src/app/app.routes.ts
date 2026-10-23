@@ -48,11 +48,48 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
-    path: 'actividad/ordenar',
+    path: 'estudiante',
     loadComponent: () =>
       import(
-        './features/actividades/actividad-ordenar/actividad-ordenar'
-      ).then((m) => m.ActividadOrdenarComponent),
+        './features/components/perfil-estudiante/perfil-estudiante.component'
+      ).then((m) => m.PerfilEstudianteComponent),
+    canActivate: [authGuard],
+  },
+  {
+  path: 'horarios',
+  loadComponent: () => import('./features/components/horarios/horarios').then(m => m.HorariosComponent),
+  canActivate: [authGuard]
+  },
+  {
+    path: 'actividad/ordenar',
+    loadComponent: () =>
+      import('./features/actividades/actividad-ordenar/actividad-ordenar').then(
+        (m) => m.ActividadOrdenarComponent
+      ),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'actividad/ordenar/:tareaId',
+    loadComponent: () =>
+      import('./features/actividades/actividad-ordenar/actividad-ordenar').then(
+        (m) => m.ActividadOrdenarComponent
+      ),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'actividad/unir-con-flechas',
+    loadComponent: () =>
+      import('./features/actividades/actividad-unir/actividad-unir').then(
+        (m) => m.ActividadUnirComponent
+      ),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'actividad/unir-con-flechas/:tareaId',
+    loadComponent: () =>
+      import('./features/actividades/actividad-unir/actividad-unir').then(
+        (m) => m.ActividadUnirComponent
+      ),
     canActivate: [authGuard],
   },
   {

@@ -34,14 +34,42 @@
       </button>
     </header>
 
-    <!-- Barra de Consigna -->
+    <!-- Barra de Consigna con botón de lectura por voz -->
     <div class="barra-consigna">
       <span class="badge-tipo">UNIR CON FLECHAS</span>
       <p class="texto-consigna">{{ consignaTexto() }}</p>
+      <button
+        type="button"
+        class="btn-escuchar-consigna"
+        (click)="leerConsigna()"
+        aria-label="Escuchar consigna"
+        title="Escuchar consigna">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+        </svg>
+        <span>Escuchar</span>
+      </button>
     </div>
 
+    <!-- Banner informativo cuando la actividad ya está realizada (Modo solo lectura) -->
+    @if (actividadTerminada()) {
+      <div class="resumen-completada" role="status">
+        <div class="resumen-encabezado">
+          <span class="badge-completada">✓ Actividad completada · Solo lectura</span>
+        </div>
+        <div class="resumen-detalles">
+          @if (horaCompletada()) {
+            <span class="dato-completada">🕒 Completada: <strong>{{ horaCompletada() }}</strong></span>
+          }
+          @if (totalIntentosRealizados() > 0) {
+            <span class="dato-completada">🎯 Intentos realizados: <strong>{{ totalIntentosRealizados() }}</strong></span>
+          }
+        </div>
+      </div>
+    }
+
     <!-- Tablero Central -->
-    <div class="cuerpo-actividad">
+    <div class="cuerpo-actividad" [class.modo-lectura]="actividadTerminada()">
       <div #tablero class="tablero-unir">
         
         <!-- SVG de Flechas -->
@@ -148,6 +176,7 @@
       [total]="totalItems()"
       [guardando]="guardando()"
       [guardadoExitoso]="guardadoExitoso()"
+      [puedeReintentar]="puedeReintentar()"
       rutaActividad="/actividad/unir-con-flechas"
       (reiniciar)="reintentar()"
       (continuar)="volver()">

@@ -32,31 +32,32 @@ export class ActividadOrdenarComponent implements OnInit {
   private location = inject(Location);
 
   audioHabilitado = signal<boolean>(true);
-
-  // ID de la tarea a resolver (por defecto 1, que es la tarea de Ordenar en chispas_bd.sql)
   tareaId = signal<number>(1);
 
-  // Estados de control de actividad y guardado
+  materiaNombre = signal<string>('LENGUA Y LITERATURA');
+  temaContenido = signal<string>('Don Quijote de la Mancha');
+  consignaTexto = signal<string>('Arrastrá o tocá las imágenes para colocarlas en el orden correcto');
+
   guardando = signal<boolean>(false);
   actividadTerminada = signal<boolean>(false);
   mostrarExito = signal<boolean>(false);
   guardadoExitoso = signal<boolean>(false);
 
-  // Datos del resultado para el Modal
+  // Datos para vista de actividad ya realizada (solo lectura)
+  horaCompletada = signal<string>('');
+  totalIntentosRealizados = signal<number>(0);
+
   aciertosObtenidos = signal<number | null>(null);
   totalItems = signal<number>(4);
   tituloModal = signal<string>('¡Excelente trabajo!');
   mensajeModal = signal<string>('');
   puedeReintentar = signal<boolean>(true);
 
-  // Mensajes de alerta en pantalla
   mensaje = signal<{ texto: string; tipo: 'exito' | 'error' | 'info' | null }>({
     texto: '',
     tipo: null
   });
 
-  // Imágenes que coinciden con los IDs de la base de datos (Actividad 1: Don Quijote)
-  // Las imágenes se sirven desde resources/static/images/ del backend
   private backendBase = 'http://localhost:8080';
   imagenesBase: ImagenActividad[] = [
     { id: 2, titulo: 'Sale de su casa', url: `${this.backendBase}/images/don-quijote-saliendo.webp` },
@@ -65,50 +66,113 @@ export class ActividadOrdenarComponent implements OnInit {
     { id: 3, titulo: 'Ve Molinos', url: `${this.backendBase}/images/don-quijote-molino.webp` }
   ];
 
-  // Estado del tablero
   disponibles = signal<ImagenActividad[]>([]);
   casilleros = signal<(ImagenActividad | null)[]>([null, null, null, null]);
 
-  // Estados de interacción
   imagenSeleccionada = signal<ImagenActividad | null>(null);
   imagenArrastrada = signal<{ img: ImagenActividad; origenCasilleroIndex?: number } | null>(null);
   casilleroHover = signal<number | null>(null);
 
   ngOnInit(): void {
-    // Tomar tareaId desde la ruta o query params si viene
     const idParam = this.route.snapshot.paramMap.get('tareaId') || this.route.snapshot.queryParamMap.get('tareaId');
     if (idParam) {
       this.tareaId.set(Number(idParam));
       this.cargarDatosBackend(Number(idParam));
     } else {
       this.reintentar();
+      this.leerConsigna();
     }
   }
 
   cargarDatosBackend(tareaId: number): void {
-  this.actividadService.obtenerDetalle(tareaId).subscribe({
-    next: (detalle) => {
-      // Cargamos las imágenes dinámicas del backend
-      this.imagenesBase = detalle.items.map(item => ({
-        id: item.itemId,
-        titulo: item.titulo,
-        url: item.imagenUrl
-      }));
-      this.totalItems.set(detalle.items.length);
-      // Ajustamos la cantidad de casilleros disponibles a la cantidad de items
-      this.casilleros.set(new Array(detalle.items.length).fill(null));
-      this.reintentar();
-    },
-    error: (err) => {
-      console.error('Error al cargar detalle de la tarea:', err);
-      this.reintentar(); // Fallback
-    }
-  });
+    this.actividadService.obtenerDetalle(tareaId).subscribe({
+      next: (detalle) => {
+        if (detalle.materia?.nombre) this.materiaNombre.set(detalle.materia.nombre.toUpperCase());
+        const subtitulo = detalle.contenido?.texto || detalle.contenido?.titulo || detalle.titulo;
+        if (subtitulo) this.temaContenido.set(subtitulo);
+        if (detalle.consigna) this.consignaTexto.set(detalle.consigna);
+
+        this.imagenesBase = detalle.items.map(item => ({
+          id: item.itemId,
+          titulo: item.titulo || item.textoAlt,
+          url: item.imagenUrl
+        }));
+        this.totalItems.set(detalle.items.length);
+        this.casilleros.set(new Array(detalle.items.length).fill(null));
+
+        if (detalle.realizada) {
+          this.cargarEstadoResuelto(tareaId);
+        } else {
+          this.reintentar();
+          this.leerConsigna();
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar detalle de la tarea:', err);
+        this.reintentar();
+        this.leerConsigna();
+      }
+    });
   }
 
-  // Interacción por clic/tap
+  cargarEstadoResuelto(tareaId: number): void {
+    this.actividadTerminada.set(true);
+    this.mostrarExito.set(false);
+    this.guardadoExitoso.set(true);
+    this.imagenSeleccionada.set(null);
+    this.imagenArrastrada.set(null);
+    this.casilleroHover.set(null);
+
+    // 1. Armamos la secuencia resuelta ordenando por itemId ascendente (orden real en BD)
+    const ordenResuelto = [...this.imagenesBase].sort((a, b) => a.id - b.id);
+    this.casilleros.set(ordenResuelto);
+    this.disponibles.set([]);
+
+    // 2. Recuperamos la hora guardada localmente (si existe)
+    if (this.esBrowser) {
+      const horaGuardada = localStorage.getItem(`chispas_hora_tarea_${tareaId}`);
+      if (horaGuardada) this.horaCompletada.set(horaGuardada);
+    }
+
+    // 3. Consultamos al endpoint existente GET /tareas/:id/resultado para obtener el total de intentos
+    this.actividadService.obtenerHistorial(tareaId).subscribe({
+      next: (historial) => {
+        const intentos = historial.cantidadIntentos ?? historial.totalIntentos ?? historial.intentos?.length ?? 1;
+        this.totalIntentosRealizados.set(intentos > 0 ? intentos : 1);
+      },
+      error: () => {
+        this.totalIntentosRealizados.set(1);
+      }
+    });
+  }
+
+  private ahoraFormateado(): string {
+    const ahora = new Date();
+    const dia = ahora.getDate().toString().padStart(2, '0');
+    const mes = (ahora.getMonth() + 1).toString().padStart(2, '0');
+    const anio = ahora.getFullYear();
+    const horas = ahora.getHours().toString().padStart(2, '0');
+    const minutos = ahora.getMinutes().toString().padStart(2, '0');
+    return `${dia}/${mes}/${anio} a las ${horas}:${minutos} hs`;
+  }
+
+  private guardarHoraCompletada(tareaId: number): void {
+    const horaTexto = this.ahoraFormateado();
+    this.horaCompletada.set(horaTexto);
+    if (this.esBrowser) {
+      localStorage.setItem(`chispas_hora_tarea_${tareaId}`, horaTexto);
+    }
+  }
+
+  leerConsigna(): void {
+    this.leerTexto(this.consignaTexto());
+  }
+
   seleccionarImagen(img: ImagenActividad) {
-    if (this.actividadTerminada()) return;
+    if (this.actividadTerminada()) {
+      this.leerTexto(img.titulo);
+      return;
+    }
     this.leerTexto(img.titulo);
     if (this.imagenSeleccionada()?.id === img.id) {
       this.imagenSeleccionada.set(null);
@@ -119,7 +183,11 @@ export class ActividadOrdenarComponent implements OnInit {
   }
 
   asignarACasillero(index: number) {
-    if (this.actividadTerminada()) return;
+    if (this.actividadTerminada()) {
+      const img = this.casilleros()[index];
+      if (img) this.leerTexto(img.titulo);
+      return;
+    }
     const seleccionada = this.imagenSeleccionada();
     if (seleccionada) {
       this.colocarEnCasillero(seleccionada, index);
@@ -129,7 +197,6 @@ export class ActividadOrdenarComponent implements OnInit {
     }
   }
 
-  // Drag and Drop Ratón
   onDragStart(event: DragEvent, img: ImagenActividad, origenCasilleroIndex?: number) {
     if (this.actividadTerminada()) return;
     this.leerTexto(img.titulo);
@@ -141,6 +208,7 @@ export class ActividadOrdenarComponent implements OnInit {
   }
 
   onDragOver(event: DragEvent, indexCasillero?: number) {
+    if (this.actividadTerminada()) return;
     event.preventDefault();
     if (event.dataTransfer) {
       event.dataTransfer.dropEffect = 'move';
@@ -155,6 +223,7 @@ export class ActividadOrdenarComponent implements OnInit {
   }
 
   onDropEnCasillero(event: DragEvent, destinoIndex: number) {
+    if (this.actividadTerminada()) return;
     event.preventDefault();
     this.casilleroHover.set(null);
     const dragData = this.imagenArrastrada();
@@ -165,6 +234,7 @@ export class ActividadOrdenarComponent implements OnInit {
   }
 
   onDropEnDisponibles(event: DragEvent) {
+    if (this.actividadTerminada()) return;
     event.preventDefault();
     const dragData = this.imagenArrastrada();
     if (dragData && dragData.origenCasilleroIndex !== undefined) {
@@ -178,7 +248,6 @@ export class ActividadOrdenarComponent implements OnInit {
     this.casilleroHover.set(null);
   }
 
-  // Touch Mobile / Tablet
   onTouchStart(event: TouchEvent, img: ImagenActividad, origenCasilleroIndex?: number) {
     if (this.actividadTerminada()) return;
     this.leerTexto(img.titulo);
@@ -250,9 +319,6 @@ export class ActividadOrdenarComponent implements OnInit {
     }
   }
 
-  // ============================================================
-  // ENTREGA Y CORRECCIÓN REAL CON EL BACKEND (SIN MOCK)
-  // ============================================================
   terminar() {
     const actuales = this.casilleros();
     if (actuales.includes(null)) {
@@ -262,10 +328,9 @@ export class ActividadOrdenarComponent implements OnInit {
       return;
     }
 
-    // Armar el payload ItemRespuestaDTO que espera el backend
     const items: ItemRespuestaDTO[] = actuales.map((img, index) => ({
       itemId: img!.id,
-      posicionElegida: index + 1, // 1-based index (1, 2, 3, 4)
+      posicionElegida: index + 1,
       itemUnidoId: null
     }));
 
@@ -281,38 +346,31 @@ export class ActividadOrdenarComponent implements OnInit {
         this.totalItems.set(resultado.totalItems);
         this.mensajeModal.set(resultado.mensaje);
         this.puedeReintentar.set(resultado.puedeIntentar);
+        this.totalIntentosRealizados.update(n => n + 1);
 
         if (resultado.aciertos === resultado.totalItems) {
           this.tituloModal.set('¡Felicitaciones!');
           this.actividadTerminada.set(true);
-        } else if (resultado.aciertos >= Math.ceil(resultado.totalItems / 2)) {
+          this.puedeReintentar.set(false);
+          this.guardarHoraCompletada(this.tareaId());
+      } else if (resultado.aciertos >= Math.ceil(resultado.totalItems / 2)) {
           this.tituloModal.set('¡Estuviste muy cerca!');
-        } else {
+          this.puedeReintentar.set(true);
+      } else {
           this.tituloModal.set('¡Buen intento!');
-        }
+          this.puedeReintentar.set(true);
+      }
 
-        // Abre el modal de desempeño y feedback
         this.mostrarExito.set(true);
-        this.leerTexto(resultado.mensaje);
         const palabraAcierto = resultado.aciertos === 1 ? 'acierto' : 'aciertos';
         const locucionCompleta = `${resultado.mensaje} Tuviste ${resultado.aciertos} ${palabraAcierto} de ${resultado.totalItems}.`;
         this.leerTexto(locucionCompleta);
       },
-        error: (err) => {
+      error: (err) => {
         this.guardando.set(false);
 
         if (err.status === 409) {
-          this.actividadTerminada.set(true);
-          this.aciertosObtenidos.set(null); 
-
-          this.mensaje.set({ texto: '', tipo: null });
-
-          this.tituloModal.set('¡Actividad ya completada!');
-          this.mensajeModal.set('Ya respondiste correctamente esta actividad anteriormente.');
-          this.puedeReintentar.set(false);
-          this.guardadoExitoso.set(true);
-          this.mostrarExito.set(true);
-          this.leerTexto(this.mensajeModal());
+          this.cargarEstadoResuelto(this.tareaId());
         } else {
           const msg = err.error?.message || 'Ocurrió un error al enviar las respuestas al servidor.';
           this.mensaje.set({ texto: msg, tipo: 'error' });
@@ -323,7 +381,7 @@ export class ActividadOrdenarComponent implements OnInit {
 
   reintentar() {
     this.disponibles.set([...this.imagenesBase]);
-    this.casilleros.set([null, null, null, null]);
+    this.casilleros.set(new Array(this.imagenesBase.length || 4).fill(null));
     this.imagenSeleccionada.set(null);
     this.imagenArrastrada.set(null);
     this.casilleroHover.set(null);
@@ -341,7 +399,7 @@ export class ActividadOrdenarComponent implements OnInit {
     }
   }
 
-    leerTexto(texto: string): void {
+  leerTexto(texto: string): void {
     if (!this.esBrowser || !this.audioHabilitado() || !('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const locucion = new SpeechSynthesisUtterance(texto);

@@ -20,6 +20,7 @@ export class ActividadExitoComponent {
   total = input<number | null>(4);
   guardando = input<boolean>(false);
   guardadoExitoso = input<boolean>(false);
+  puedeReintentar = input<boolean>(true);
   
   // Ruta de la actividad para asegurar la redirección (ej: '/actividad/ordenar')
   rutaActividad = input<string>('');

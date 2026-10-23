@@ -60,7 +60,6 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
   private esBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private location = inject(Location);
 
-  // Tarea 2 en la base de datos es la actividad de Unir con Flechas de Don Quijote
   tareaId = signal<number>(2);
 
   materiaNombre = signal<string>('LENGUA Y LITERATURA');
@@ -71,17 +70,18 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     return this.authService.isAuthenticated() && this.authService.getRol() === 'ESTUDIANTE';
   }
 
-  // Control de voz / accesibilidad (Lectura por síntesis de voz)
   audioHabilitado = signal<boolean>(true);
 
-  // Estados de control de la actividad
   guardando = signal<boolean>(false);
   actividadTerminada = signal<boolean>(false);
   mostrarExito = signal<boolean>(false);
   guardadoExitoso = signal<boolean>(false);
   puedeReintentar = signal<boolean>(true);
 
-  // Datos para el Modal de Desempeño
+  // Datos para vista de actividad ya realizada (solo lectura)
+  horaCompletada = signal<string>('');
+  totalIntentosRealizados = signal<number>(0);
+
   aciertosObtenidos = signal<number | null>(null);
   totalItems = signal<number>(4);
   tituloModal = signal<string>('¡Excelente trabajo!');
@@ -91,7 +91,6 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     tipo: null
   });
 
-  // 1. Columna Izquierda: 4 Imágenes de Don Quijote (IDs 10, 11, 12, 13 en la BD)
   imagenes: ImagenUnir[] = [
     { id: 10, texto: 'Don Quijote lee un libro', url: 'http://localhost:8080/images/don-quijote-leyendo.webp' },
     { id: 11, texto: 'Don Quijote sale de casa', url: 'http://localhost:8080/images/don-quijote-saliendo.webp' },
@@ -99,7 +98,6 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     { id: 13, texto: 'Don Quijote vuelve a casa', url: 'http://localhost:8080/images/don-quijote-volviendo.webp' }
   ];
 
-  // 2. Columna Derecha: 4 Frases de Don Quijote (IDs 101, 102, 103, 104 en la BD)
   acciones: AccionTextoUnir[] = [
     { id: 101, texto: 'Don Quijote sale de casa' },
     { id: 102, texto: 'Don Quijote ve un molino' },
@@ -107,7 +105,6 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     { id: 104, texto: 'Don Quijote vuelve a casa' }
   ];
 
-  // Paleta de colores para las flechas
   readonly PALETA = [
     { nombre: 'azul', hex: '#2563eb' },
     { nombre: 'naranja', hex: '#f59e0b' },
@@ -126,6 +123,7 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
       this.cargarDatosBackend(Number(idParam));
     } else {
       this.reintentar();
+      this.leerConsigna();
     }
   }
 
@@ -133,9 +131,10 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     this.actividadService.obtenerDetalle(tareaId).subscribe({
       next: (detalle) => {
         if (detalle.materia?.nombre) this.materiaNombre.set(detalle.materia.nombre.toUpperCase());
-        if (detalle.titulo) this.temaContenido.set(detalle.titulo);
+        const subtitulo = detalle.contenido?.texto || detalle.contenido?.titulo || detalle.titulo;
+        if (subtitulo) this.temaContenido.set(subtitulo);
         if (detalle.consigna) this.consignaTexto.set(detalle.consigna);
-        // 1. Separamos los ítems de la columna izquierda (Imágenes)
+
         this.imagenes = detalle.items
           .filter(item => item.lado === 'IZQ')
           .map(item => ({
@@ -144,7 +143,6 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
             url: item.imagenUrl
           }));
 
-        // 2. Separamos los ítems de la columna derecha (Frases / Textos)
         this.acciones = detalle.items
           .filter(item => item.lado === 'DER')
           .map(item => ({
@@ -152,36 +150,129 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
             texto: item.titulo || item.textoAlt
           }));
 
-        // 3. Cantidad de parejas que el alumno debe unir
         this.totalItems.set(this.imagenes.length);
 
-        // 4. Si la tarea ya estaba finalizada en el backend, bloqueamos la edición
         if (detalle.realizada) {
-          this.actividadTerminada.set(true);
-          this.tituloModal.set('¡Actividad ya completada!');
-          this.mensajeModal.set('Ya respondiste correctamente esta actividad anteriormente.');
-          this.guardadoExitoso.set(true);
-          this.mostrarExito.set(true);
+          this.cargarEstadoResuelto(tareaId);
         } else {
-          // Preparamos el tablero limpio para resolver
           this.reintentar();
+          this.leerConsigna();
         }
 
-        // 5. Esperamos un ciclo de renderizado para recalcular los puntos de conexión
         if (this.esBrowser) {
           setTimeout(() => this.recalcularFlechas(), 150);
         }
       },
       error: (err) => {
         console.error('Error al cargar detalle de la actividad unir:', err);
-        this.reintentar(); // Si falla, queda con el estado inicial de respaldo
+        this.reintentar();
+        this.leerConsigna();
       }
     });
   }
 
-    ngAfterViewInit(): void {
-    if (!this.esBrowser) return;
+  cargarEstadoResuelto(tareaId: number): void {
+    this.actividadTerminada.set(true);
+    this.mostrarExito.set(false);
+    this.guardadoExitoso.set(true);
+    this.limpiarSelecciones();
 
+    // 1. Armamos las flechas resueltas (desde localStorage si se guardaron o emparejando por texto)
+    const conexionesResueltas: ConexionUnir[] = [];
+    if (this.esBrowser) {
+      const horaGuardada = localStorage.getItem(`chispas_hora_tarea_${tareaId}`);
+      if (horaGuardada) this.horaCompletada.set(horaGuardada);
+
+      const paresGuardadosRaw = localStorage.getItem(`chispas_pares_tarea_${tareaId}`);
+      if (paresGuardadosRaw) {
+        try {
+          const paresGuardados: ItemRespuestaDTO[] = JSON.parse(paresGuardadosRaw);
+          paresGuardados.forEach((p, idx) => {
+            if (p.itemId != null && p.itemUnidoId != null) {
+              const colorInfo = this.PALETA[idx % this.PALETA.length];
+              conexionesResueltas.push({
+                id: `${p.itemId}-${p.itemUnidoId}`,
+                origenId: p.itemId,
+                destinoId: p.itemUnidoId,
+                x1: 0,
+                y1: 0,
+                x2: 0,
+                y2: 0,
+                color: colorInfo.hex,
+                colorNombre: colorInfo.nombre,
+                estado: 'correcta'
+              });
+            }
+          });
+        } catch {
+          // Si falla el parseo, usa el emparejamiento por defecto abajo
+        }
+      }
+    }
+
+    if (!conexionesResueltas.length) {
+      this.imagenes.forEach((img, idx) => {
+        const par = this.acciones.find(a => a.texto === img.texto) ?? this.acciones[idx];
+        if (par) {
+          const colorInfo = this.PALETA[idx % this.PALETA.length];
+          conexionesResueltas.push({
+            id: `${img.id}-${par.id}`,
+            origenId: img.id,
+            destinoId: par.id,
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 0,
+            color: colorInfo.hex,
+            colorNombre: colorInfo.nombre,
+            estado: 'correcta'
+          });
+        }
+      });
+    }
+
+    this.conexiones.set(conexionesResueltas);
+    if (this.esBrowser) {
+      setTimeout(() => this.recalcularFlechas(), 150);
+    }
+
+    // 2. Consultamos el endpoint existente GET /tareas/:id/resultado para mostrar los intentos totales
+    this.actividadService.obtenerHistorial(tareaId).subscribe({
+      next: (historial) => {
+        const intentos = historial.cantidadIntentos ?? historial.totalIntentos ?? historial.intentos?.length ?? 1;
+        this.totalIntentosRealizados.set(intentos > 0 ? intentos : 1);
+      },
+      error: () => {
+        this.totalIntentosRealizados.set(1);
+      }
+    });
+  }
+
+  private ahoraFormateado(): string {
+    const ahora = new Date();
+    const dia = ahora.getDate().toString().padStart(2, '0');
+    const mes = (ahora.getMonth() + 1).toString().padStart(2, '0');
+    const anio = ahora.getFullYear();
+    const horas = ahora.getHours().toString().padStart(2, '0');
+    const minutos = ahora.getMinutes().toString().padStart(2, '0');
+    return `${dia}/${mes}/${anio} a las ${horas}:${minutos} hs`;
+  }
+
+  private guardarDatosCompletada(tareaId: number, items: ItemRespuestaDTO[]): void {
+    const horaTexto = this.ahoraFormateado();
+    this.horaCompletada.set(horaTexto);
+    if (this.esBrowser) {
+      localStorage.setItem(`chispas_hora_tarea_${tareaId}`, horaTexto);
+      localStorage.setItem(`chispas_pares_tarea_${tareaId}`, JSON.stringify(items));
+    }
+  }
+
+  leerConsigna(): void {
+    this.leerTexto(this.consignaTexto());
+  }
+
+  ngAfterViewInit(): void {
+    if (!this.esBrowser) return;
     setTimeout(() => this.recalcularFlechas(), 150);
   }
 
@@ -208,7 +299,10 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
   }
 
   seleccionarImagen(img: ImagenUnir): void {
-    if (this.actividadTerminada()) return;
+    if (this.actividadTerminada()) {
+      this.leerTexto(img.texto);
+      return;
+    }
     this.leerTexto(img.texto);
 
     if (this.imagenSeleccionada()?.id === img.id) {
@@ -227,7 +321,10 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
   }
 
   seleccionarAccion(accion: AccionTextoUnir): void {
-    if (this.actividadTerminada()) return;
+    if (this.actividadTerminada()) {
+      this.leerTexto(accion.texto);
+      return;
+    }
     this.leerTexto(accion.texto);
 
     if (this.accionSeleccionada()?.id === accion.id) {
@@ -321,13 +418,9 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     return `M ${c.x1} ${c.y1} C ${c.x1 + distancia} ${c.y1}, ${c.x2 - distancia} ${c.y2}, ${c.x2} ${c.y2}`;
   }
 
-  // ============================================================
-  // EVALUACIÓN Y PERSISTENCIA AUTOMÁTICA SEGÚN LA HISTORIA DE USUARIO
-  // ============================================================
   terminar(): void {
     const conns = this.conexiones();
 
-    // Criterio: Debe completar las 4 relaciones antes de terminar
     if (conns.length < this.imagenes.length) {
       const aviso = '¡Casi listo! Une las 4 imágenes con sus frases para ver tu resultado.';
       this.mensajeAlerta.set({ texto: aviso, tipo: 'aviso' });
@@ -335,10 +428,9 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // Armar el payload ItemRespuestaDTO para TareaServiceImpl
     const items: ItemRespuestaDTO[] = conns.map(c => ({
-      itemId: c.origenId,         // Ítem izquierda
-      itemUnidoId: c.destinoId,   // Ítem derecha
+      itemId: c.origenId,
+      itemUnidoId: c.destinoId,
       posicionElegida: null
     }));
 
@@ -348,59 +440,44 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     this.actividadService.entregarTarea(this.tareaId(), { items }).subscribe({
       next: (resultado: ResultadoTareaDTO) => {
         this.guardando.set(false);
-        this.guardadoExitoso.set(true); // Persistido en el backend automáticamente
+        this.guardadoExitoso.set(true);
 
         this.aciertosObtenidos.set(resultado.aciertos);
         this.totalItems.set(resultado.totalItems);
         this.mensajeModal.set(resultado.mensaje);
         this.puedeReintentar.set(resultado.puedeIntentar);
+        this.totalIntentosRealizados.update(n => n + 1);
 
         const acertoTodo = resultado.aciertos === resultado.totalItems;
 
-        // Feedback en las flechas
         conns.forEach(c => {
           c.estado = acertoTodo ? 'correcta' : 'revisar';
         });
         this.conexiones.set([...conns]);
 
-        // Títulos de feedback acordes a los Escenarios 1, 2 y 3
         if (acertoTodo) {
-          // ESCENARIO 1: 4/4 ("¡Felicitaciones respondiste todo correctamente!")
           this.tituloModal.set('¡Felicitaciones!');
           this.actividadTerminada.set(true);
+          this.puedeReintentar.set(false);
+          this.guardarDatosCompletada(this.tareaId(), items);
         } else if (resultado.aciertos >= 2) {
-          // ESCENARIO 2: 3/4 o 2/4 ("¡Estuviste muy cerca! ¡Inténtalo de nuevo!")
           this.tituloModal.set('¡Estuviste muy cerca!');
+          this.puedeReintentar.set(true);
         } else {
-          // ESCENARIO 3: 1/4 o 0/4 ("¡Buen intento! Cada vez que practicás...")
           this.tituloModal.set('¡Buen intento!');
+          this.puedeReintentar.set(true);
         }
 
-        // Abre el modal y reproduce por voz el mensaje devuelto por el servidor
         this.mostrarExito.set(true);
-        this.leerTexto(resultado.mensaje);
         const palabraAcierto = resultado.aciertos === 1 ? 'acierto' : 'aciertos';
         const locucionCompleta = `${resultado.mensaje} Tuviste ${resultado.aciertos} ${palabraAcierto} de ${resultado.totalItems}.`;
         this.leerTexto(locucionCompleta);
       },
-        error: (err) => {
+      error: (err) => {
         this.guardando.set(false);
 
         if (err.status === 409) {
-          // Ocultar botón TERMINAR
-          this.actividadTerminada.set(true);
-          this.aciertosObtenidos.set(null); 
-
-          // Limpiar alertas del tablero
-          this.mensajeAlerta.set({ texto: '', tipo: null });
-
-          // Abrir modal con mensaje cordial
-          const msg = '¡Ya respondiste correctamente esta actividad anteriormente!';
-          this.tituloModal.set('¡Actividad ya completada!');
-          this.mensajeModal.set(msg);
-          this.guardadoExitoso.set(true);
-          this.mostrarExito.set(true);
-          this.leerTexto(msg);
+          this.cargarEstadoResuelto(this.tareaId());
         } else {
           const msg = err.error?.message || 'Ocurrió un error al enviar tu entrega.';
           this.mensajeAlerta.set({ texto: msg, tipo: 'error' });
@@ -409,7 +486,6 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // Prepara el tablero para el siguiente intento (intento 2, 3...)
   reintentar(): void {
     this.conexiones.set([]);
     this.limpiarSelecciones();

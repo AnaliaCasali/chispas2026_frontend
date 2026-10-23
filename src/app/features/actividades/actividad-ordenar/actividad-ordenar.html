@@ -11,8 +11,8 @@
       </button>
 
       <div class="info-encabezado">
-        <h1>LENGUA Y LITERATURA</h1>
-        <span class="subtitulo">Don Quijote de la Mancha</span>
+        <h1>{{ materiaNombre() }}</h1>
+        <span class="subtitulo">{{ temaContenido() }}</span>
       </div>
 
       <!-- Botón de Audio accesible -->
@@ -34,43 +34,75 @@
       </button>
     </header>
 
-    <!-- Barra de Consigna -->
+    <!-- Barra de Consigna con botón de lectura por voz -->
     <div class="barra-consigna">
       <span class="badge-tipo">ORDENAR LA HISTORIA</span>
-      <p class="texto-consigna">Arrastrá o tocá las imágenes para colocarlas en el orden correcto</p>
+      <p class="texto-consigna">{{ consignaTexto() }}</p>
+      <button
+        type="button"
+        class="btn-escuchar-consigna"
+        (click)="leerConsigna()"
+        aria-label="Escuchar consigna"
+        title="Escuchar consigna">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+        </svg>
+        <span>Escuchar</span>
+      </button>
     </div>
 
-    <div class="cuerpo-actividad">
-
-      <!-- Zona de Imágenes Disponibles -->
-      <div class="seccion-zona">
-        <span class="etiqueta-seccion">Imágenes disponibles</span>
-        <div class="grilla-imagenes"
-             (dragover)="onDragOver($event)"
-             (drop)="onDropEnDisponibles($event)">
-          @for (img of disponibles(); track img.id) {
-            <div class="item-imagen" 
-                 draggable="true"
-                 [class.seleccionada]="imagenSeleccionada()?.id === img.id"
-                 [class.arrastrando]="imagenArrastrada()?.img?.id === img.id"
-                 (dragstart)="onDragStart($event, img)"
-                 (dragend)="onDragEnd()"
-                 (touchstart)="onTouchStart($event, img)"
-                 (touchmove)="onTouchMove($event)"
-                 (touchend)="onTouchEnd($event)"
-                 (click)="seleccionarImagen(img)">
-              <div class="img-wrapper">
-                <img [src]="img.url" [alt]="img.titulo">
-              </div>
-              <span class="titulo-imagen">{{ img.titulo }}</span>
-            </div>
+    <!-- Banner informativo cuando la actividad ya está realizada (Modo solo lectura) -->
+    @if (actividadTerminada()) {
+      <div class="resumen-completada" role="status">
+        <div class="resumen-encabezado">
+          <span class="badge-completada">✓ Actividad completada · Solo lectura</span>
+        </div>
+        <div class="resumen-detalles">
+          @if (horaCompletada()) {
+            <span class="dato-completada">🕒 Completada: <strong>{{ horaCompletada() }}</strong></span>
+          }
+          @if (totalIntentosRealizados() > 0) {
+            <span class="dato-completada">🎯 Intentos realizados: <strong>{{ totalIntentosRealizados() }}</strong></span>
           }
         </div>
       </div>
+    }
+
+    <div class="cuerpo-actividad" [class.modo-lectura]="actividadTerminada()">
+
+      <!-- Zona de Imágenes Disponibles (se oculta si ya está resuelta) -->
+      @if (!actividadTerminada()) {
+        <div class="seccion-zona">
+          <span class="etiqueta-seccion">Imágenes disponibles</span>
+          <div class="grilla-imagenes"
+               (dragover)="onDragOver($event)"
+               (drop)="onDropEnDisponibles($event)">
+            @for (img of disponibles(); track img.id) {
+              <div class="item-imagen" 
+                   draggable="true"
+                   [class.seleccionada]="imagenSeleccionada()?.id === img.id"
+                   [class.arrastrando]="imagenArrastrada()?.img?.id === img.id"
+                   (dragstart)="onDragStart($event, img)"
+                   (dragend)="onDragEnd()"
+                   (touchstart)="onTouchStart($event, img)"
+                   (touchmove)="onTouchMove($event)"
+                   (touchend)="onTouchEnd($event)"
+                   (click)="seleccionarImagen(img)">
+                <div class="img-wrapper">
+                  <img [src]="img.url" [alt]="img.titulo">
+                </div>
+                <span class="titulo-imagen">{{ img.titulo }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
 
       <!-- Zona de Casilleros 1, 2, 3, 4 -->
       <div class="seccion-zona">
-        <span class="etiqueta-seccion">Orden de la historia</span>
+        <span class="etiqueta-seccion">
+          {{ actividadTerminada() ? 'Secuencia resuelta correctamente' : 'Orden de la historia' }}
+        </span>
         <div class="grilla-casilleros">
           @for (item of casilleros(); track $index) {
             <div class="casillero" 
@@ -78,13 +110,14 @@
                  [class.vacio]="!item" 
                  [class.resaltado]="imagenSeleccionada() && !item"
                  [class.drag-sobre]="casilleroHover() === $index"
+                 [class.casillero-resuelto]="actividadTerminada() && !!item"
                  (dragover)="onDragOver($event, $index)"
                  (dragleave)="onDragLeave()"
                  (drop)="onDropEnCasillero($event, $index)"
                  (click)="asignarACasillero($index)">
               @if (item) {
                 <div class="item-imagen"
-                     draggable="true"
+                     [attr.draggable]="!actividadTerminada()"
                      [class.arrastrando]="imagenArrastrada()?.img?.id === item.id"
                      (dragstart)="onDragStart($event, item, $index)"
                      (dragend)="onDragEnd()"
@@ -129,19 +162,20 @@
 
     </div>
 
-    <!-- Pantalla de Éxito / Desempeño -->
-    <app-actividad-exito
-      [visible]="mostrarExito()"
-      [titulo]="tituloModal()"
-      [mensaje]="mensajeModal()"
-      [aciertos]="aciertosObtenidos()"
-      [total]="totalItems()"
-      [guardando]="guardando()"
-      [guardadoExitoso]="guardadoExitoso()"
-      rutaActividad="/actividad/ordenar"
-      (reiniciar)="reintentar()"
-      (continuar)="volver()">
-    </app-actividad-exito>
+    <!-- Pantalla de Éxito / Desempeño (al entregar por primera vez) -->
+  <app-actividad-exito
+    [visible]="mostrarExito()"
+    [titulo]="tituloModal()"
+    [mensaje]="mensajeModal()"
+    [aciertos]="aciertosObtenidos()"
+    [total]="totalItems()"
+    [guardando]="guardando()"
+    [guardadoExitoso]="guardadoExitoso()"
+    [puedeReintentar]="puedeReintentar()"
+    rutaActividad="/actividad/ordenar"
+    (reiniciar)="reintentar()"
+    (continuar)="volver()">
+  </app-actividad-exito>
 
   </div>
 </div>

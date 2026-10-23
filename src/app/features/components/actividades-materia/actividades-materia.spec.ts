@@ -219,8 +219,8 @@ describe('ActividadesMateriaComponent', () => {
     });
   });
 
-  describe('Modal de historial para tareas realizadas', () => {
-    it('clic en tarea realizada abre el modal de historial y consulta el resultado al backend', async () => {
+  describe('Tareas realizadas y modal de historial', () => {
+    it('clic en tarjeta de tarea realizada navega a la plantilla de la actividad en modo lectura', async () => {
       iniciarSesionDePrueba();
       await crear('1');
 
@@ -232,25 +232,35 @@ describe('ActividadesMateriaComponent', () => {
       );
       await fixture.whenStable();
 
-      // Clic en la segunda tarea (realizada)
+      // Clic en la segunda tarea (realizada, tipo UNIR_FLECHAS, tareaId 20)
       const tarjetas = dom().querySelectorAll('.tarjeta-tarea');
       (tarjetas[1] as HTMLElement).click();
       await fixture.whenStable();
 
-      // Petición al endpoint de resultado de la tarea
+      expect(navigate).toHaveBeenCalledWith(['/actividad/unir-con-flechas', 20], {
+        state: { materiaNombre: 'Lengua y Literatura' },
+      });
+    });
+
+    it('verResultadoRealizada abre el modal de historial y consulta el resultado al backend', async () => {
+      iniciarSesionDePrueba();
+      await crear('1');
+
+      const dto = crearActividadesMateriaDTO();
+      responder(http, 'GET', '/materias/1/actividades', dto);
+      await fixture.whenStable();
+
+      fixture.componentInstance.verResultadoTarea(dto.actividades[1]);
+      await fixture.whenStable();
+
       responder(http, 'GET', '/tareas/20/resultado', crearHistorialTareaDTO());
       await fixture.whenStable();
 
       expect(dom().querySelector('.modal-backdrop')).not.toBeNull();
       expect(textoVisible(dom())).toContain('¡Actividad Realizada!');
       expect(textoVisible(dom())).toContain('4 / 4');
-      expect(textoVisible(dom())).toContain('¡Excelente trabajo!');
-      expect(textoVisible(dom())).toContain('Intento 1');
 
-      // Act: cerrar el modal
       await clic(fixture, 'Volver a la carpeta');
-
-      // Assert: se oculta el modal
       expect(dom().querySelector('.modal-backdrop')).toBeNull();
     });
   });
