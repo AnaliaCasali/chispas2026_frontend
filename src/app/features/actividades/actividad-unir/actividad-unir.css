@@ -336,3 +336,76 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+/* Botón para escuchar la consigna en voz */
+.texto-consigna {
+  flex: 1;
+}
+
+.btn-escuchar-consigna {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-escuchar-consigna:hover {
+  background-color: #dbeafe;
+  transform: translateY(-1px);
+}
+
+/* Banner de Actividad Completada (Modo Solo Lectura) */
+.resumen-completada {
+  margin: 16px 24px 0;
+  padding: 12px 18px;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.badge-completada {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #065f46;
+}
+
+.resumen-detalles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: #047857;
+}
+
+.dato-completada strong {
+  color: #064e3b;
+  font-weight: 800;
+}
+
+/* Estado visual de solo lectura en el tablero */
+.cuerpo-actividad.modo-lectura .item-imagen,
+.cuerpo-actividad.modo-lectura .linea-flecha {
+  cursor: default;
+}
+
+.casillero.casillero-resuelto .item-imagen {
+  border-color: #10b981;
+  background-color: #ecfdf5;
+}

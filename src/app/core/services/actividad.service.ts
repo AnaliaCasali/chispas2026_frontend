@@ -16,15 +16,18 @@ export interface EntregaRequestDTO {
 export interface IntentoResumenDTO {
   intento: number;
   aciertos: number;
-  total: number;
+  totalItems?: number;
+  total?: number;
 }
 
 export interface HistorialTareaDTO {
   tareaId: number;
   estado: string;
   ultimoResultado: ResultadoTareaDTO | null;
-  ultimoIntento: number | null;
-  totalIntentos: number;
+  intentoActual?: number;
+  cantidadIntentos?: number;
+  ultimoIntento?: number | null;
+  totalIntentos?: number;
   intentos: IntentoResumenDTO[];
 }
 
@@ -48,8 +51,10 @@ export interface TareaDetalleDTO {
     icono?: string;
   };
   contenido: {
-    contenidoId: number;
-    titulo: string;
+    contenidoId?: number; 
+    titulo?: string; 
+    tema?: string; 
+    texto?: string;
     portadaUrl?: string;
   };
   actividadId: number;

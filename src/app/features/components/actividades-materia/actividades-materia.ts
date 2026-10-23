@@ -66,12 +66,6 @@ export class ActividadesMateriaComponent implements OnInit {
     this.filtroActual.set(nuevoFiltro);
   }
   abrirTarea(tarea: ActividadCarpetaDTO): void {
-    // Si ya está realizada, mostramos el modal de resultado e historial
-    if (tarea.realizada) {
-      this.verResultadoTarea(tarea);
-      return;
-    }
-    // Si está pendiente, navegamos a la pantalla según el tipo de plantilla
     const codigo = tarea.tipoActividad?.codigo?.toUpperCase();
     if (codigo === 'ORDENAR') {
       this.router.navigate(['/actividad/ordenar', tarea.tareaId], {
@@ -86,6 +80,7 @@ export class ActividadesMateriaComponent implements OnInit {
       this.router.navigate(['/actividad/ordenar', tarea.tareaId]);
     }
   }
+  
   verResultadoTarea(tarea: ActividadCarpetaDTO): void {
     this.tareaSeleccionadaTitulo.set(tarea.titulo);
     this.cargandoHistorial.set(true);
