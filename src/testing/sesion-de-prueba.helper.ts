@@ -1,7 +1,7 @@
 import { Role, User } from "../app/core/models/user";
 
-export const CLAVE_TOKEN = 'rcc_token';
-export const CLAVE_USUARIO = 'rcc_user';
+export const CLAVE_TOKEN = 'chispas_token';
+export const CLAVE_USUARIO = 'chispas_user';
 
 export interface UsuarioPrueba {
   id: number;
@@ -54,4 +54,12 @@ export function iniciarSesionCorrupta(): void {
 export function cerrarSesionDePrueba(): void {
   localStorage.removeItem(CLAVE_TOKEN);
   localStorage.removeItem(CLAVE_USUARIO);
+}
+
+export interface UsuarioPrueba {
+  id: number;
+  username: string; // DNI o Email
+  nombre: string;
+  apellido: string;
+  rol: Role;
 }

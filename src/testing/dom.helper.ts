@@ -61,3 +61,15 @@ export function alertas(raiz: HTMLElement): string[] {
 export function textoVisible(raiz: HTMLElement): string {
   return raiz.textContent?.replace(/\s+/g, ' ').trim() ?? '';
 }
+
+
+/** Busca un elemento interactivo por su texto exacto visible. */
+export function elementoPorTexto(raiz: HTMLElement, texto: string, selector = '*'): HTMLElement {
+  const el = Array.from(raiz.querySelectorAll(selector)).find(
+    (e) => e.textContent?.trim() === texto,
+  );
+  if (!el) {
+    throw new Error(`No se encontró un elemento con el texto "${texto}"`);
+  }
+  return el as HTMLElement;
+}

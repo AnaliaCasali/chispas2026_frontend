@@ -15,10 +15,16 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
+  it('debe tener el signal title configurado', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    expect(app['title']()).toBe('chispas2026_frontend');
+  });
+
+  it('debe renderizar el router-outlet', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, chispas2026_frontend');
+    expect(compiled.querySelector('router-outlet')).not.toBeNull();
   });
 });
