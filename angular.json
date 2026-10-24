@@ -22,12 +22,12 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                            "input": "public"
               }
-            ],
-            "styles": [
+      ],
+                        "styles": [
               "src/styles.css"
-            ],
+      ],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
@@ -38,7 +38,15 @@
             }
           },
           "configurations": {
+            "security": {
+              "allowedHosts": ["chispas.ies63lastoscas.edu.ar"]
+            },
             "production": {
+
+              "fileReplacements": [
+
+                { "replace": "src/environments/environment.ts", "with": "src/environments/environment.production.ts" }],
+
               "budgets": [
                 {
                   "type": "initial",
@@ -48,12 +56,15 @@
                  {
                   "type": "anyComponentStyle",
                   "maximumWarning": "35kB",
-                  "maximumError": "50kB"
+                              "maximumError": "50kB"
                 }
-              ],
+        ],
               "outputHashing": "all"
             },
             "development": {
+                "fileReplacements": [
+                { "replace": "src/environments/environment.ts", "with": "src/environments/environment.development.ts" }
+              ],
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true

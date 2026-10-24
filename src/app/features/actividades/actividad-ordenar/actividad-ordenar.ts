@@ -8,6 +8,7 @@ import {
   ResultadoTareaDTO
 } from '../../../core/services/actividad.service';
 import { ActividadExitoComponent } from '../actividad-exito/actividad-exito';
+import { environment } from '../../../../environments/environment.production';
 
 export interface ImagenActividad {
   id: number;
@@ -58,7 +59,7 @@ export class ActividadOrdenarComponent implements OnInit {
     tipo: null
   });
 
-  private backendBase = 'http://localhost:8080';
+  private backendBase = environment.backendUrl;
   imagenesBase: ImagenActividad[] = [
     { id: 2, titulo: 'Sale de su casa', url: `${this.backendBase}/images/don-quijote-saliendo.webp` },
     { id: 1, titulo: 'Don Quijote lee', url: `${this.backendBase}/images/don-quijote-leyendo.webp` },
