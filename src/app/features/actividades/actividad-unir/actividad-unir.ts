@@ -14,11 +14,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import {
   ActividadService,
+  ItemActividadDTO,
   ItemRespuestaDTO,
   ResultadoTareaDTO
 } from '../../../core/services/actividad.service';
 import { ActividadExitoComponent } from '../actividad-exito/actividad-exito';
-import { environment } from '../../../../environments/environment';
 
 export interface ImagenUnir {
   id: number;
@@ -61,11 +61,11 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
   private esBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private location = inject(Location);
 
-  tareaId = signal<number>(2);
+  tareaId = signal<number>(0);
 
-  materiaNombre = signal<string>('LENGUA Y LITERATURA');
-  temaContenido = signal<string>('Don Quijote de la Mancha');
-  consignaTexto = signal<string>('Uní cada imagen con la frase que corresponde');
+  materiaNombre = signal<string>('');
+  temaContenido = signal<string>('');
+  consignaTexto = signal<string>('');
 
   get esEstudiante(): boolean {
     return this.authService.isAuthenticated() && this.authService.getRol() === 'ESTUDIANTE';
@@ -84,7 +84,7 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
   totalIntentosRealizados = signal<number>(0);
 
   aciertosObtenidos = signal<number | null>(null);
-  totalItems = signal<number>(4);
+  totalItems = signal<number>(0);
   tituloModal = signal<string>('¡Excelente trabajo!');
   mensajeModal = signal<string>('');
   mensajeAlerta = signal<{ texto: string; tipo: 'info' | 'aviso' | 'error' | null }>({
@@ -92,19 +92,9 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     tipo: null
   });
 
-  imagenes: ImagenUnir[] = [
-    { id: 10, texto: 'Don Quijote lee un libro',url: `${environment.backendUrl}/images/don-quijote-leyendo.webp` },
-    { id: 11, texto: 'Don Quijote sale de casa', url: `${environment.backendUrl}/images/don-quijote-saliendo.webp` },
-    { id: 12, texto: 'Don Quijote ve un molino', url: `${environment.backendUrl}/images/don-quijote-molino.webp` },
-    { id: 13, texto: 'Don Quijote vuelve a casa', url: `${environment.backendUrl}/images/don-quijote-volviendo.webp` }
-  ];
-
-  acciones: AccionTextoUnir[] = [
-    { id: 101, texto: 'Don Quijote sale de casa' },
-    { id: 102, texto: 'Don Quijote ve un molino' },
-    { id: 103, texto: 'Don Quijote lee un libro' },
-    { id: 104, texto: 'Don Quijote vuelve a casa' }
-  ];
+  // se cargan del backend (GET /tareas/:id): IZQ = imágenes, DER = frases, cada columna por su posición
+  imagenes: ImagenUnir[] = [];
+  acciones: AccionTextoUnir[] = [];
 
   readonly PALETA = [
     { nombre: 'azul', hex: '#2563eb' },
@@ -124,8 +114,12 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
       this.cargarDatosBackend(Number(idParam));
     } else {
       this.reintentar();
-      this.leerConsigna();
+      this.mostrarErrorCarga();
     }
+  }
+
+  private mostrarErrorCarga(): void {
+    this.mensajeAlerta.set({ texto: 'No se pudo cargar la actividad. Volvé a intentarlo más tarde.', tipo: 'error' });
   }
 
   cargarDatosBackend(tareaId: number): void {
@@ -136,8 +130,11 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
         if (subtitulo) this.temaContenido.set(subtitulo);
         if (detalle.consigna) this.consignaTexto.set(detalle.consigna);
 
+        const porPosicion = (a: ItemActividadDTO, b: ItemActividadDTO) => (a.posicion ?? 0) - (b.posicion ?? 0);
+
         this.imagenes = detalle.items
           .filter(item => item.lado === 'IZQ')
+          .sort(porPosicion)
           .map(item => ({
             id: item.itemId,
             texto: item.titulo || item.textoAlt,
@@ -146,6 +143,7 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
 
         this.acciones = detalle.items
           .filter(item => item.lado === 'DER')
+          .sort(porPosicion)
           .map(item => ({
             id: item.itemId,
             texto: item.titulo || item.textoAlt
@@ -167,7 +165,7 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
       error: (err) => {
         console.error('Error al cargar detalle de la actividad unir:', err);
         this.reintentar();
-        this.leerConsigna();
+        this.mostrarErrorCarga();
       }
     });
   }
@@ -423,7 +421,7 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
     const conns = this.conexiones();
 
     if (conns.length < this.imagenes.length) {
-      const aviso = '¡Casi listo! Une las 4 imágenes con sus frases para ver tu resultado.';
+      const aviso = `¡Casi listo! Une las ${this.imagenes.length} imágenes con sus frases para ver tu resultado.`;
       this.mensajeAlerta.set({ texto: aviso, tipo: 'aviso' });
       this.leerTexto(aviso);
       return;
