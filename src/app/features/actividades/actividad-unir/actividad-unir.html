@@ -114,7 +114,7 @@
               (click)="seleccionarImagen(img)"
             >
               <div class="img-container">
-                <img [src]="img.url" [alt]="img.texto" />
+                <img [src]="img.url | urlBackend" [alt]="img.texto" />
               </div>
               <div [id]="'dot-izq-' + img.id" class="conector-punto conector-der"
                    [style.border-color]="getConexionDeImagen(img.id)?.color || '#1e3b70'"></div>

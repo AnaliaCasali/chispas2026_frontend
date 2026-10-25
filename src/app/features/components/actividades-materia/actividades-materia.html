@@ -67,7 +67,7 @@
             
             <div class="contenedor-portada">
               @if (tarea.imagenUrl) {
-                <img [src]="tarea.imagenUrl" [alt]="tarea.titulo" class="imagen-tarea" />
+                <img [src]="tarea.imagenUrl | urlBackend" [alt]="tarea.titulo" class="imagen-tarea" />
               } @else {
                 <div class="placeholder-portada">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="#cbd5e1">
