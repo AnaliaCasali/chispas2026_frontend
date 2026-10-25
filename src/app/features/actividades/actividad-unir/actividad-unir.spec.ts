@@ -87,6 +87,37 @@ describe('ActividadUnirComponent', () => {
     }
   }
 
+  it('carga dinámicamente del backend todas las imágenes (IZQ) y frases (DER), ordenadas por posición', async () => {
+    const items = crearItemsActividadDto('UNIR_FLECHAS').reverse();
+    await crear(2, crearTareaDetalleDto({
+      tareaId: 2,
+      tipoActividad: { codigo: 'UNIR_FLECHAS', nombre: 'Unir con flechas' },
+      items,
+    }));
+
+    const imgs = Array.from(dom().querySelectorAll('.columna-izq img')) as HTMLImageElement[];
+    expect(imgs.map(i => i.getAttribute('src'))).toEqual([
+      'http://localhost:8080/images/img10.webp',
+      'http://localhost:8080/images/img11.webp',
+      'http://localhost:8080/images/img12.webp',
+      'http://localhost:8080/images/img13.webp',
+    ]);
+    expect(imgs.map(i => i.alt)).toEqual([
+      'Don Quijote lee un libro',
+      'Don Quijote sale de casa',
+      'Don Quijote ve un molino',
+      'Don Quijote vuelve a casa',
+    ]);
+    const frases = Array.from(dom().querySelectorAll('.columna-der .texto-accion')).map(p => p.textContent?.trim());
+    expect(frases).toEqual([
+      'Don Quijote sale de casa',
+      'Don Quijote ve un molino',
+      'Don Quijote lee un libro',
+      'Don Quijote vuelve a casa',
+    ]);
+    expect(fixture.componentInstance.totalItems()).toBe(4);
+  });
+
   it('ngOnInit con tareaId pendiente → solicita detalle al backend, lee consigna y muestra ambas columnas', async () => {
     const speakSpy = vi.fn();
     Object.assign(window, {
@@ -346,7 +377,7 @@ describe('ActividadUnirComponent', () => {
     expect(navigate).toHaveBeenCalledWith(['/mi-carpeta']);
   });
 
-  it('error al cargar detalle en ngOnInit o ruta sin tareaId → aplica fallback con estado inicial', async () => {
+  it('error al cargar detalle en ngOnInit o ruta sin tareaId → tablero vacío y mensaje de error', async () => {
     TestBed.configureTestingModule({
       imports: [ActividadUnirComponent],
       providers: [
@@ -368,10 +399,13 @@ describe('ActividadUnirComponent', () => {
 
     responderError(http, 'GET', '/tareas/99', 500);
     await fixture.whenStable();
-    expect(fixture.componentInstance.imagenes.length).toBe(4);
+    expect(fixture.componentInstance.imagenes.length).toBe(0);
+    expect(fixture.componentInstance.acciones.length).toBe(0);
+    expect(textoVisible(dom())).toContain('No se pudo cargar la actividad.');
 
     fixture.componentInstance['route'].snapshot.queryParamMap.get = () => null;
     fixture.componentInstance.ngOnInit();
     expect(fixture.componentInstance.conexiones().length).toBe(0);
+    expect(fixture.componentInstance.mensajeAlerta().tipo).toBe('error');
   });
 });
