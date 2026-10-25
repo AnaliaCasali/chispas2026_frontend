@@ -18,6 +18,7 @@ import {
   ResultadoTareaDTO
 } from '../../../core/services/actividad.service';
 import { ActividadExitoComponent } from '../actividad-exito/actividad-exito';
+import { UrlBackendPipe } from '../../../shared/pipes/url-backend.pipe';
 import { environment } from '../../../../environments/environment';
 
 export interface ImagenUnir {
@@ -47,7 +48,7 @@ export interface ConexionUnir {
 @Component({
   selector: 'app-actividad-unir',
   standalone: true,
-  imports: [CommonModule, ActividadExitoComponent],
+  imports: [CommonModule, ActividadExitoComponent, UrlBackendPipe],
   templateUrl: './actividad-unir.html',
   styleUrl: './actividad-unir.css'
 })

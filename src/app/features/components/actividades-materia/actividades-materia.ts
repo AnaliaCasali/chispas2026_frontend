@@ -4,12 +4,14 @@ import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { CarpetaService } from '../../services/carpeta.service';
 import { ActividadesMateriaDTO, ActividadCarpetaDTO } from '../../models/inicio.model';
 import { ActividadService, HistorialTareaDTO } from '../../../core/services/actividad.service';
+import { UrlBackendPipe } from '../../../shared/pipes/url-backend.pipe';
+
 export type FiltroActividad = 'todas' | 'pendientes' | 'realizadas';
 
 @Component({
   selector: 'app-actividades-materia',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, UrlBackendPipe],
   templateUrl: './actividades-materia.html',
   styleUrl: './actividades-materia.css'
 })

@@ -8,6 +8,7 @@ import {
   ResultadoTareaDTO
 } from '../../../core/services/actividad.service';
 import { ActividadExitoComponent } from '../actividad-exito/actividad-exito';
+import { UrlBackendPipe } from '../../../shared/pipes/url-backend.pipe';
 import { environment } from '../../../../environments/environment';
 
 export interface ImagenActividad {
@@ -20,7 +21,7 @@ export interface ImagenActividad {
 @Component({
   selector: 'app-actividad-ordenar',
   standalone: true,
-  imports: [CommonModule, ActividadExitoComponent],
+  imports: [CommonModule, ActividadExitoComponent, UrlBackendPipe],
   templateUrl: './actividad-ordenar.html',
   styleUrl: './actividad-ordenar.css'
 })
