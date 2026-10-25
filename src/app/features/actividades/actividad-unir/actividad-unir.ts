@@ -18,6 +18,7 @@ import {
   ResultadoTareaDTO
 } from '../../../core/services/actividad.service';
 import { ActividadExitoComponent } from '../actividad-exito/actividad-exito';
+import { environment } from '../../../../environments/environment';
 
 export interface ImagenUnir {
   id: number;
@@ -92,10 +93,10 @@ export class ActividadUnirComponent implements OnInit, AfterViewInit {
   });
 
   imagenes: ImagenUnir[] = [
-    { id: 10, texto: 'Don Quijote lee un libro',url: '${environment.backendUrl}/images/don-quijote-leyendo.webp' },
-    { id: 11, texto: 'Don Quijote sale de casa', url: '${environment.backendUrl}/images/don-quijote-saliendo.webp' },
-    { id: 12, texto: 'Don Quijote ve un molino', url: '${environment.backendUrl}/images/don-quijote-molino.webp' },
-    { id: 13, texto: 'Don Quijote vuelve a casa', url: '${environment.backendUrl}/images/don-quijote-volviendo.webp' }
+    { id: 10, texto: 'Don Quijote lee un libro',url: `${environment.backendUrl}/images/don-quijote-leyendo.webp` },
+    { id: 11, texto: 'Don Quijote sale de casa', url: `${environment.backendUrl}/images/don-quijote-saliendo.webp` },
+    { id: 12, texto: 'Don Quijote ve un molino', url: `${environment.backendUrl}/images/don-quijote-molino.webp` },
+    { id: 13, texto: 'Don Quijote vuelve a casa', url: `${environment.backendUrl}/images/don-quijote-volviendo.webp` }
   ];
 
   acciones: AccionTextoUnir[] = [

@@ -1,59 +1,79 @@
-# Chispas2026Frontend
+# Chispas 2026 — Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.8.
+Aplicación web de **Chispas**, la plataforma del IES 63 para que docentes y estudiantes trabajen con carpetas, tareas, horarios y actividades.
 
-## Development server
+- **Producción:** https://chispas.ies63lastoscas.edu.ar
+- **Backend:** [chispas2026_backend](https://github.com/AnaliaCasali/chispas2026_backend)
 
-To start a local development server, run:
+## Tecnologías
 
-```bash
-ng serve
-```
+- Angular 22 con SSR (`@angular/ssr` y Express)
+- Tests con Vitest y cobertura con `@vitest/coverage-v8`
+- Docker, con imagen publicada en GitHub Container Registry
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Requisitos
 
-## Code scaffolding
+- Node.js 22 y npm
+- El backend corriendo en http://localhost:8080 (ver el README del backend)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Correr en local
 
 ```bash
-ng generate --help
+npm ci
+npm start          # ng serve
 ```
 
-## Building
+Abrir http://localhost:4200. La app se recarga sola al guardar cambios.
 
-To build the project run:
+## Configuración
+
+La URL de la API se define en `src/environments/`:
+
+| Archivo | Se usa en | `apiUrl` |
+|---|---|---|
+| `environment.development.ts` | `ng serve` | `http://localhost:8080/api/v1` |
+| `environment.production.ts` | `ng build` (producción) | `https://chispas.ies63lastoscas.edu.ar/api/v1` |
+
+En producción el servidor SSR solo acepta el host `chispas.ies63lastoscas.edu.ar` (`allowedHosts` en `angular.json` y `NG_ALLOWED_HOSTS` en el contenedor).
+
+## Tests
 
 ```bash
-ng build
+npx ng test --watch=false --coverage
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+`npm test` también funciona, pero queda en modo watch. El reporte de cobertura queda en `coverage/`.
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Build
 
 ```bash
-ng test
+npm run build
+npm run serve:ssr:chispas2026_frontend   # sirve el build SSR en http://localhost:4000
 ```
 
-## Running end-to-end tests
+## Rutas principales
 
-For end-to-end (e2e) testing, run:
+| Ruta | Pantalla |
+|---|---|
+| `/bienvenida`, `/login` | Bienvenida e inicio de sesión |
+| `/inicio` | Inicio |
+| `/mi-carpeta` | Carpeta y materias (`/mi-carpeta/materias/:id/actividades`) |
+| `/horarios` | Horario |
+| `/estudiante` | Perfil del estudiante |
+| `/actividad/ordenar`, `/actividad/unir-con-flechas` | Actividades interactivas |
 
-```bash
-ng e2e
+## Estructura
+
+```
+src/app/
+├── core/       guards, interceptores, modelos y servicios compartidos
+├── features/   pantallas (login, actividades, componentes, ...)
+└── shared/     componentes reutilizables
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## CI/CD y deploy
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **`.github/workflows/ci.yml` (CI/CD):** en cada push y pull request corre los tests con cobertura y el build. Al mergear a `main`, además publica la imagen en `ghcr.io/analiacasali/chispas2026_frontend`.
+- **`.github/workflows/deploy.yml`:** cuando el CI termina bien en `main`, entra por SSH al servidor y ejecuta `deploy.sh front`, que baja la imagen nueva y reinicia el contenedor.
+- **Configuración del servidor:** el `compose.yaml` del servidor y `deploy.sh` están en la carpeta `deploy/` del repo del backend.
+- **Imagen Docker:** Node 22, sirve el SSR en el puerto 4000 y no corre como root.

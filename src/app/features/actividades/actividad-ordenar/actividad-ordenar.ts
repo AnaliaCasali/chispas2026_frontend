@@ -8,7 +8,7 @@ import {
   ResultadoTareaDTO
 } from '../../../core/services/actividad.service';
 import { ActividadExitoComponent } from '../actividad-exito/actividad-exito';
-import { environment } from '../../../../environments/environment.production';
+import { environment } from '../../../../environments/environment';
 
 export interface ImagenActividad {
   id: number;
