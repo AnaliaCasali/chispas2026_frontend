@@ -89,7 +89,7 @@
                    (touchend)="onTouchEnd($event)"
                    (click)="seleccionarImagen(img)">
                 <div class="img-wrapper">
-                  <img [src]="img.url" [alt]="img.titulo">
+                  <img [src]="img.url | urlBackend" [alt]="img.titulo">
                 </div>
                 <span class="titulo-imagen">{{ img.titulo }}</span>
               </div>
@@ -125,7 +125,7 @@
                      (touchmove)="onTouchMove($event)"
                      (touchend)="onTouchEnd($event)">
                   <div class="img-wrapper">
-                    <img [src]="item.url" [alt]="item.titulo">
+                    <img [src]="item.url | urlBackend" [alt]="item.titulo">
                   </div>
                   <span class="titulo-imagen">{{ item.titulo }}</span>
                 </div>
